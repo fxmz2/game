@@ -570,12 +570,12 @@ details.who summary{ font-family:var(--display); font-size:20px; letter-spacing:
 <div class="screen" id="shareScreen" hidden>
     <div class="panel">
         <h2 class="big">TEILEN!</h2>
-        <p class="sub">Bild gedrückt halten und „Sichern" oder „Teilen" wählen – dann ab in die WhatsApp-Gruppe.</p>
+        <p class="sub">Bild gedrückt halten und „Sichern“ oder „Teilen“ wählen – dann ab in die WhatsApp-Gruppe.</p>
         <img class="sharepic" id="sharePic" alt="Ergebnisbild">
         <div class="sharetext" id="shareText"></div>
         <div class="btnrow">
             <button class="btn small" id="copyBtn">Text kopieren</button>
-            <a class="btn small" id="dlLink" download="hau-den-strassdorfer.png">Bild speichern</a>
+            <button class="btn small" id="dlBtn">Bild speichern</button>
             <button class="btn small" id="shareClose">Zurück</button>
         </div>
     </div>
@@ -2059,7 +2059,24 @@ function shareTextFor(r) {
     const who = (settings.name || "").trim();
     if (r.mode === "elfmeter") return `${who ? who + ": " : ""}Elfmeterschießen Rechberg ${r.elf[0]} : ${r.elf[1]} Straßdorf! 🔨⚽ Kannst du's besser? ${GAME_URL}`;
     if (r.reason === "jail") return `${who ? who + " hat" : "Ich hab"} den Rechberger Präsidenten ghauen und sitzt jetzt hinter schwedischen Gardinen 🚔 – aber vorher ${r.stats.bumps} Straßdorfern a Beule verpasst! ${GAME_URL}`;
-    return `${who ? who + " hat" : "Ich hab"} ${r.stats.bumps} Straßdorfern a Beule verpasst! 🔨 ${r.score} Punkte im ${MODES[r.mode].label} – „${r.rankTitle}". Schaffst du mehr? ${GAME_URL}`;
+    return `${who ? who + " hat" : "Ich hab"} ${r.stats.bumps} Straßdorfern a Beule verpasst! 🔨 ${r.score} Punkte im ${MODES[r.mode].label} – „${r.rankTitle}“. Schaffst du mehr? ${GAME_URL}`;
+}
+let shareBlob = null, shareUrl = null, downloadsNs;
+/* In der Claude-Version läuft Speichern über die downloads-Fähigkeit, sonst über einen normalen Download. */
+async function saveAvailable() {
+    if (!window.claude || typeof window.claude.use !== "function") return true;
+    if (downloadsNs === undefined) { try { downloadsNs = await window.claude.use("downloads"); } catch (e) { downloadsNs = null; } }
+    return !!downloadsNs;
+}
+async function saveImage() {
+    if (!shareBlob) return;
+    if (downloadsNs) {
+        try { await downloadsNs.save({ filename: "hau-den-strassdorfer.png", data: shareBlob }); } catch (e) { /* abgelehnt oder nicht möglich */ }
+        return;
+    }
+    const a = document.createElement("a");
+    a.href = shareUrl; a.download = "hau-den-strassdorfer.png";
+    document.body.appendChild(a); a.click(); a.remove();
 }
 async function shareResult() {
     if (!lastResult) return;
@@ -2075,7 +2092,8 @@ async function shareResult() {
         }
         const url = URL.createObjectURL(blob);
         $("#sharePic").src = url;
-        $("#dlLink").href = url;
+        shareBlob = blob; shareUrl = url;
+        $("#dlBtn").hidden = !(await saveAvailable());
         $("#shareText").textContent = text;
         $("#shareScreen").hidden = false;
         fitTitles();
@@ -2191,6 +2209,7 @@ $("#menuBtn").addEventListener("click", () => { $("#endScreen").hidden = true; $
 $("#boardBtn").addEventListener("click", () => { readMenu(); openBoard(settings.mode === "elfmeter" ? "standard" : settings.mode); });
 $("#boardClose").addEventListener("click", () => { $("#boardScreen").hidden = true; });
 $("#shareBtn").addEventListener("click", shareResult);
+$("#dlBtn").addEventListener("click", saveImage);
 $("#shareClose").addEventListener("click", () => { $("#shareScreen").hidden = true; });
 $("#copyBtn").addEventListener("click", () => {
     const t = $("#shareText").textContent;
