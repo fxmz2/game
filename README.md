@@ -1,7 +1,7 @@
 # Hau den Straßdorfer!
 
 Ein Comic-Spiel im Browser zum Derby Rechberg gegen Straßdorf: Du bist Rechberger,
-hast eine Waffe mit Vereinslogo – und auf 25 Löchern gucken Straßdorfer raus.
+hast eine Waffe mit Vereinslogo – und aus 12 Löchern (3×4) gucken Straßdorfer raus.
 
 ## Spielen
 
@@ -10,7 +10,7 @@ Alles steckt in dieser einen Datei (Logos eingebettet, Sounds werden im Browser 
 
 ## Modi
 
-- **Standard** – 60 Sekunden, wird immer hektischer
+- **Standard** – 60 Sekunden, wird nach und nach schneller
 - **Boss-Modus** – 30 Sekunden Vollgas von Anfang an
 - **Endlos** – bis alle 3 Gold-Ochsen-Bierkrüge kaputt sind (Eigentor oder entwischter Straßdorfer kostet einen)
 
@@ -32,7 +32,7 @@ Dazu Schwierigkeit (Leicht / Mittel / Schwer), 8 Figuren und 8 Waffen – alle W
 | Gold-Ochsen-Flasche | hauen = 1 Bier zurück |
 | Wurst | hauen = 5 Sekunden mehr |
 | Bombe | **nicht hauen!** Sonst KABUMM |
-| XXXL-Horlacher | der Boss über 9 Löcher – viele Schläge bis zum K.O., +300 |
+| XXXL-Horlacher | der Boss über 6 Löcher – viele Schläge bis zum K.O., +300 |
 
 Daneben hauen kostet 5 Punkte.
 
