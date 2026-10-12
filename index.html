@@ -3,6 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Hau den Straßdorfer">
+<meta name="theme-color" content="#4fb3ff">
+<link rel="apple-touch-icon" href="icon.png">
 <title>Hau den Straßdorfer!</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -21,7 +27,7 @@
     --display:Bangers, Impact, "Arial Black", sans-serif;
     --body:"Comic Neue", "Comic Sans MS", "Chalkboard SE", cursive;
     --vh:100vh;
-    --hs:min(29vw, calc((var(--vh) - 200px) / 5.3), 160px);
+    --hs:min(29vw, calc((var(--vh) - 214px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)) / 5.3), 160px);
     --hw:130px;
     color-scheme:light;
 }
@@ -36,6 +42,7 @@ html,body{
     font-family:var(--body);
     user-select:none; -webkit-user-select:none; -webkit-touch-callout:none;
     -webkit-tap-highlight-color:transparent; touch-action:manipulation;
+    -webkit-text-size-adjust:100%;
 }
 input{ user-select:text; -webkit-user-select:text; }
 body.playing.fine, body.playing.fine *{ cursor:none; }
@@ -87,6 +94,13 @@ body.playing, body.playing *{ touch-action:none; }
     width:40px; height:40px; font-size:19px; padding:0;
     background:#fff; border:3px solid var(--ink); border-radius:50%; box-shadow:3px 3px 0 var(--ink); cursor:pointer;
 }
+
+#pauseBtn{
+    position:fixed; top:calc(8px + env(safe-area-inset-top, 0px)); left:8px; z-index:70; display:none;
+    width:40px; height:40px; font-size:17px; padding:0; line-height:1;
+    background:#fff; border:3px solid var(--ink); border-radius:50%; box-shadow:3px 3px 0 var(--ink); cursor:pointer;
+}
+body.playing #pauseBtn{ display:block; }
 
 /* ---------- Spielfeld ---------- */
 #board{
@@ -221,7 +235,20 @@ body.playing, body.playing *{ touch-action:none; }
 #me.sad{ animation:droop .9s ease-in-out; }
 @keyframes hop2{ 40%{ transform:translateY(-16px) scale(1.06); } }
 @keyframes droop{ 30%,70%{ transform:rotate(-6deg) translateY(4px); } }
-#powerwrap{ flex:1; max-width:260px; align-self:center; text-align:center; font-family:var(--display); letter-spacing:1px; }
+#mid{ flex:1; min-width:0; max-width:420px; align-self:center; display:flex; flex-direction:column; gap:6px; }
+#powerwrap{ text-align:center; font-family:var(--display); letter-spacing:1px; }
+#reporter{
+    position:relative; background:#fff; border:3px solid var(--ink); border-radius:12px; box-shadow:3px 3px 0 var(--ink);
+    padding:4px 8px; height:54px; overflow:hidden; text-align:left;
+    font:700 13px/1.25 var(--body);
+    display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical;
+}
+#reporter.pop{ animation:reppop .3s cubic-bezier(.2,1.6,.5,1); }
+@keyframes reppop{ from{ transform:scale(.9) rotate(-1.5deg); background:var(--yellow); } }
+#beerMeter{ width:64px; height:80px; flex:none; position:relative; text-align:center; }
+#beerMeter svg{ width:100%; height:62px; overflow:visible; display:block; }
+#beerMeter span{ display:block; font-family:var(--display); font-size:14px; letter-spacing:.5px; line-height:1; }
+#beerMeter.full svg{ animation:beerpulse .3s infinite alternate; }
 #powerbar{ height:14px; border:3px solid var(--ink); background:#fff; border-radius:8px; overflow:hidden; box-shadow:3px 3px 0 var(--ink); }
 #powerbar i{ display:block; height:100%; width:0; background:repeating-linear-gradient(45deg, var(--gold) 0 8px, #ffd84a 8px 16px); }
 #beerBtn{ width:80px; height:82px; flex:none; padding:0; border:none; background:none; cursor:pointer; animation:beerpulse .45s ease-in-out infinite alternate; position:relative; z-index:55; }
@@ -376,6 +403,12 @@ h3{ font-family:var(--display); font-weight:400; font-size:22px; letter-spacing:
 .btn:focus-visible{ outline:3px solid var(--blue); outline-offset:3px; }
 .btn.small{ font-size:20px; padding:6px 16px; background:#fff; color:var(--ink); -webkit-text-stroke:0; border-width:3px; box-shadow:4px 4px 0 var(--ink); }
 .btnrow{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:16px; }
+.startbar{
+    position:sticky; bottom:-16px; z-index:3; margin:16px -18px 0; padding:12px 18px;
+    background:var(--paper); border-top:3px solid var(--ink);
+    display:flex; gap:10px; justify-content:center; align-items:center; flex-wrap:wrap;
+}
+.tip{ font-size:13px; margin:10px 0 0; background:#e3ecff; border:2px dashed var(--blue); border-radius:8px; padding:6px 10px; }
 
 details.who{ margin-top:14px; text-align:left; }
 details.who summary{ font-family:var(--display); font-size:20px; letter-spacing:1px; cursor:pointer; }
@@ -426,10 +459,13 @@ details.who summary{ font-family:var(--display); font-size:20px; letter-spacing:
     .stat{ min-width:62px; padding:2px 6px 4px; }
     .stat b{ font-size:20px; }
     .derby img{ height:26px; }
-    .rules,.statlist{ grid-template-columns:1fr; }
+    .rules{ grid-template-columns:1fr; }
+    .statlist{ font-size:12.5px; gap:5px; }
+    .statlist li{ padding:3px 6px; }
     .choices.c4{ grid-template-columns:repeat(2, minmax(0,1fr)); }
     .choice label b{ font-size:16px; }
     .panel{ padding:14px 12px; }
+    .startbar{ margin:16px -12px 0; padding:10px 12px; }
 }
 @media (prefers-reduced-motion: reduce){
     #bg .rays, .guy.up .gi, #beerBtn, .walker .wb, .walker .leg, #lettiFx .patch{ animation:none !important; }
@@ -505,7 +541,11 @@ details.who summary{ font-family:var(--display); font-size:20px; letter-spacing:
     <main id="board"></main>
     <footer id="bottombar">
         <div id="me" aria-hidden="true"></div>
-        <div id="powerwrap" hidden><div>STARK WIE A OCHS!</div><div id="powerbar"><i></i></div></div>
+        <div id="mid">
+            <div id="powerwrap" hidden><div>STARK WIE A OCHS!</div><div id="powerbar"><i></i></div></div>
+            <div id="reporter" aria-live="polite">📻 Gleich geht's los…</div>
+        </div>
+        <div id="beerMeter" title="Bier-o-Meter: 15 Treffer am Stück = Ex-Bier"></div>
         <button id="beerBtn" hidden aria-label="Bier exen"></button>
     </footer>
 </div>
@@ -518,6 +558,7 @@ details.who summary{ font-family:var(--display); font-size:20px; letter-spacing:
 <div id="hammer"></div>
 <div id="toast"></div>
 <button id="mute" title="Ton an/aus" aria-label="Ton an oder aus">🔊</button>
+<button id="pauseBtn" title="Pause" aria-label="Pause">⏸</button>
 
 <!-- ===== Menü ===== -->
 <div class="screen" id="menuScreen">
@@ -534,14 +575,13 @@ details.who summary{ font-family:var(--display); font-size:20px; letter-spacing:
         <h3>Spielmodus</h3>
         <div class="choices c3" id="modeChoices"></div>
         <h3>Schwierigkeit</h3>
-        <div class="choices c3" id="diffChoices"></div>
+        <div class="choices c4" id="diffChoices"></div>
         <h3>Dein Rechberger</h3>
         <div class="choices c4" id="heroChoices"></div>
         <h3>Deine Waffe</h3>
         <div class="choices c4" id="weaponChoices"></div>
 
-        <div class="btnrow"><button class="btn" id="startBtn">LOS GEHT'S!</button></div>
-        <div class="btnrow"><button class="btn small" id="boardBtn">🏆 Bestenliste</button></div>
+        <p class="tip">📱 Tipp fürs iPhone: In Safari auf <b>Teilen</b> → <b>„Zum Home-Bildschirm“</b> – dann läuft's wie a richtige App, ohne Browserleiste.</p>
 
         <details class="who">
             <summary>Wer isch wer? (aufklappen)</summary>
@@ -552,6 +592,23 @@ details.who summary{ font-family:var(--display); font-size:20px; letter-spacing:
             <div class="rules" id="badgeList"></div>
         </details>
         <p class="disclaimer">Alle Figuren sind frei erfunden und rein comichaft. Bei der Entwicklung wurde kein Straßdorfer verletzt – höchstens im Stolz. 😉</p>
+        <div class="startbar">
+            <button class="btn" id="startBtn">LOS GEHT'S!</button>
+            <button class="btn small" id="boardBtn">🏆 Bestenliste</button>
+        </div>
+    </div>
+</div>
+
+<!-- ===== Pause ===== -->
+<div class="screen" id="pauseScreen" hidden>
+    <div class="panel">
+        <h2 class="big">PAUSE</h2>
+        <p class="sub">Kurz verschnaufen – d'Straßdorfer warten in ihre Löcher.</p>
+        <div class="btnrow"><button class="btn" id="resumeBtn">WEITER</button></div>
+        <div class="btnrow">
+            <button class="btn small" id="restartBtn">Neustart</button>
+            <button class="btn small" id="quitBtn">Menü</button>
+        </div>
     </div>
 </div>
 
@@ -628,9 +685,10 @@ const MODES = {
     endlos:   { label: "Endlos", short: "bis 3 Bier weg sind", duration: 0 }
 };
 const DIFFS = {
-    leicht: { label: "Leicht", short: "für Straßdorfer", stay: 1.35, int: 1.3, extra: 0, bossHp: 7 },
+    leicht: { label: "Leicht", short: "für Straßdorfer", stay: 1.35, int: 1.3, extra: -1, bossHp: 7 },
     mittel: { label: "Mittel", short: "Kreisliga", stay: 1, int: 1, extra: 0, bossHp: 10 },
-    schwer: { label: "Schwer", short: "Champions League", stay: .8, int: .8, extra: 1, bossHp: 13 }
+    schwer: { label: "Schwer", short: "Champions League", stay: .8, int: .8, extra: 1, bossHp: 13 },
+    extrem: { label: "Extrem", short: "verdammt schwer", stay: .55, int: .55, extra: 2, bossHp: 18 }
 };
 const TYPES = {
     idiot:   { side: "sd", pts: 10, rise: "fast" },
@@ -704,6 +762,58 @@ const LINES = {
     bossPop: ["I bin XXXL!", "Horlacher isch unkaputtbar!", "Platz da, jetzt komm i!", "Mi kriegsch net klein!"],
     bossHit: ["Des kitzelt bloß!", "Mei Ranze!", "Uff!", "Hö!", "Aua, jetzt aber!", "Hör auf, du Seggel!", "Mir wird schwindlig…"]
 };
+
+/* Der Live-Reporter vom Radio Hohenrechberg */
+const REPORT = {
+    start: ["Herzlich willkommen zum Derby! Rechberg gegen Straßdorf – des wird a Gemetzel!", "Anpfiff! Die Straßdorfer gucket scho ganz nervös aus ihre Löcher.", "Volles Haus am Hohenrechberg! Die Stimmung kocht!"],
+    hit: ["Und da kracht's! Volltreffer auf die Glatze!", "Wunderbar platziert – mitten auf d'Rübe!", "Der sitzt! Des gibt a Beule wie a Gänsei!", "Klassischer Kopfball – nur andersrum!", "Hui, des hat gscheppert bis nach Gmünd!", "Sauber! Der Straßdorfer sieht Sternle!"],
+    cry: ["Jetzt heult er! Taschentücher bitte zum Straßdorfer Block!", "Tränen in Straßdorf – und mir lachet!"],
+    pot: ["Kochtopf fliegt! Da braucht die Mama heut an neuen Topf.", "KLONG! Der Dorftrottel steht jetzt ohne Helm da."],
+    dicker: ["Der Dicke hält was aus – aber wie lang no?", "Treffer am Dicken – der wackelt wie a Pudding!"],
+    schnitzel: ["SCHNITZEL! Der Dicke hat sei Mittagessen wieder rausgegeben!", "Baumann tut's weh – und mir tut's beim Zugucken weh!"],
+    trainer: ["Der Trainer dreht sich wie a Kreisel – Taktik: Schwindel!", "Trainer getroffen! Jetzt isch die Viererkette führungslos."],
+    reich: ["Geldregen in Straßdorf! Des isch die teuerste Beule der Saison!", "Da fliegt sogar sei Gebiss – samt Goldzahn!"],
+    own: ["Oh nein, EIGENTOR! Des war oiner von uns!", "Falscher Kopf! Der Schiri schüttelt mit em Kopf.", "Buuuh! Die eigene Leut hauen – des gibt Ärger in der Kabine!"],
+    letti: ["Letti kommt… mit Voll-Speed… also, so ungefähr.", "Letti läuft! Man sieht's kaum – weil er so langsam isch."],
+    lettiHit: ["Letti getroffen! Jetzt sieht die ganze Mannschaft nur no halb."],
+    duel: ["Heimann dribbelt auf Letti zu – ZWEIKAMPF! Jetzt drücken!", "Achtung, Heimann mit Ball! Letti, hol ihn dir!"],
+    duelWin: ["GRÄTSCHE! Letti räumt den Heimann ab – fünffache Punkte!", "Voll-Speed-Grätsche! Des war sauber… oder zumindest laut."],
+    duelLose: ["Heimann tanzt den Letti aus… peinlich, peinlich.", "Olé! Heimann isch vorbei – Letti guckt hinterher."],
+    praes: ["Der Präsident isch im Stadion – Finger weg vom Hammer!"],
+    jail: ["Er hat den Präsidenten ghauen! Polizei aufs Spielfeld!"],
+    boss: ["Achtung! Der XXXL-Horlacher betritt den Rasen – der Boden bebt!", "Da kommt der Horlacher! Mehr Masse als die ganze Abwehr!"],
+    bossHit: ["Volltreffer am Horlacher – aber der merkt's kaum!", "Weiter draufhauen, der Horlacher wackelt!"],
+    bossKO: ["Der Horlacher liegt! Der größte K.O. seit Erfindung vom Leberkäs!"],
+    bossEsc: ["Der Horlacher isch abghaua – vermutlich zum Buffet."],
+    beer: ["15 am Stück! Ex oder Straßdorf – jetzt wird gext!"],
+    drink: ["Er ext! Mit Gold Ochsen im Blut haut er doppelt so fest!"],
+    bomb: ["KABUMM! Wer haut denn auf a Bombe?!", "Explosion am Hohenrechberg! Des war koi gute Idee."],
+    flasche: ["Prost! A frisches Gold Ochsen für die Mannschaft."],
+    wurst: ["Wurscht erwischt – Nachspielzeit gibt's obendrauf!"],
+    miss: ["Daneben, daneben, daneben… hat der heut sei Brille vergessa?", "Luftlöcher haut er – des zählt net!"],
+    combo: ["Der isch heiß wie Frittenfett!", "Was für a Serie! Die Fans singet scho!"],
+    combo5: ["HAMMERZEIT! Ganz Straßdorf zittert!"],
+    escape: ["Ui, der isch entwischt – des war knapp.", "Zu langsam! Der Straßdorfer lacht sich ins Fäustle."],
+    final: ["Noch zehn Sekunden – jetzt nochmal alles raushauen!"],
+    event: ["Do isch was los im Stadion!"]
+};
+let repUntil = 0, repPrio = 0;
+function report(key, prio = 1) {
+    const now = performance.now();
+    if (now < repUntil && prio <= repPrio) return;
+    const arr = REPORT[key];
+    if (!arr) return;
+    repUntil = now + 1600; repPrio = prio;
+    const el = $("#reporter");
+    el.textContent = "📻 " + pick(arr);
+    el.classList.remove("pop"); void el.offsetWidth; el.classList.add("pop");
+}
+function reportText(t, prio = 2) {
+    repUntil = performance.now() + 1600; repPrio = prio;
+    const el = $("#reporter");
+    el.textContent = "📻 " + t;
+    el.classList.remove("pop"); void el.offsetWidth; el.classList.add("pop");
+}
 
 /* =================================================================
    Figuren (SVG)
@@ -1135,7 +1245,44 @@ function whistle(parts) {
         t += len + .1;
     });
 }
+/* Stadion-Atmosphäre: Fan-Raunen als Endlosschleife */
+let crowd = null;
+function crowdStart() {
+    const a = ac(); if (!a || muted || crowd) return;
+    const len = 4, buf = a.createBuffer(1, a.sampleRate * len, a.sampleRate), d = buf.getChannelData(0);
+    let v = 0;
+    for (let i = 0; i < d.length; i++) { v = v * .985 + (Math.random() * 2 - 1) * .15; d[i] = v; }
+    const src = a.createBufferSource(), f = a.createBiquadFilter(), g = a.createGain(), lfo = a.createOscillator(), lg = a.createGain();
+    src.buffer = buf; src.loop = true;
+    f.type = "bandpass"; f.frequency.value = 650; f.Q.value = .6;
+    g.gain.value = .12; lfo.frequency.value = .25; lg.gain.value = .05;
+    lfo.connect(lg).connect(g.gain);
+    src.connect(f).connect(g).connect(a.destination);
+    src.start(); lfo.start();
+    crowd = { src, lfo };
+}
+function crowdStop() { if (!crowd) return; try { crowd.src.stop(); crowd.lfo.stop(); } catch (e) {} crowd = null; }
+/* „Olé, olé, olé, olé" – mehrstimmig wie a Fankurve */
+function chant() {
+    const a = ac(); if (!a || muted) return;
+    const notes = [[392, .2], [330, .34], [392, .2], [330, .2], [392, .2], [330, .34], [440, .2], [392, .55]];
+    let t = a.currentTime + .05;
+    notes.forEach(([f, d]) => {
+        [1, 1.012, .988, 2.002].forEach((m, k) => {
+            const o = a.createOscillator(), flt = a.createBiquadFilter(), g = a.createGain();
+            o.type = "sawtooth"; o.frequency.value = f * m * (k === 3 ? .5 : 1);
+            flt.type = "bandpass"; flt.frequency.value = 850; flt.Q.value = 1.4;
+            g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(.05, t + .04);
+            g.gain.setValueAtTime(.05, t + d - .05); g.gain.linearRampToValueAtTime(0, t + d);
+            o.connect(flt).connect(g).connect(a.destination); o.start(t); o.stop(t + d + .02);
+        });
+        t += d;
+    });
+}
 const SFX = {
+    roar(v = .16) { noise(1.1, v, 1100, 0, "bandpass"); noise(.9, v * .6, 2200, .08, "bandpass"); },
+    boo() { [128, 136, 145, 121].forEach(f => tone({ type: "sawtooth", f0: f, f1: f * .82, dur: .9, vol: .035, vib: 6, vibF: 5 })); noise(.9, .07, 400); },
+    pfiffe() { [0, .16, .34].forEach(d => tone({ type: "sine", f0: 2500, f1: 3500, dur: .16, vol: .05, delay: d })); },
     hit() {
         const w = settings.weapon;
         if (w === "pfanne") { tone({ type: "triangle", f0: 320, f1: 300, dur: .7, vol: .4 }); tone({ type: "sine", f0: 960, f1: 900, dur: .5, vol: .15 }); noise(.05, .3, 3000); }
@@ -1325,7 +1472,7 @@ function holeFoot(h) { const hr = h.el.getBoundingClientRect(), br = board.getBo
 /* =================================================================
    Spielzustand
    ================================================================= */
-let running = false, gt = 0, last = 0, nextSpawn = 0, durExtra = 0;
+let running = false, paused = false, gt = 0, last = 0, nextSpawn = 0, durExtra = 0, missStreak = 0, meterShown = -1;
 let score = 0, combo = 0, mult = 1, lives = 3, shownTime = -1, finalWarn = false, lastHitSlowmo = false;
 let stats = {};
 let beerReady = false, powerUntil = 0, lettiRun = null, duel = null, boss = null, bossAt = 0, ev = null, evPlan = [], endReason = null;
@@ -1335,10 +1482,11 @@ const duration = () => MODES[mode()].duration ? MODES[mode()].duration + durExtr
 
 function chooseType(p) {
     const lettiOk = !lettiRun && !holes.some(h => h.type === "letti" && h.state !== "down");
+    const X = settings.diff === "extrem";
     let table = [
-        ["rb", .16], ["letti", lettiOk && p > .03 ? .07 : 0], ["praes", p > .25 ? .02 : 0],
+        ["rb", X ? .22 : .16], ["letti", lettiOk && p > .03 ? .07 : 0], ["praes", p > (X ? .1 : .25) ? (X ? .035 : .02) : 0],
         ["reich", .05], ["trainer", .08], ["dicker", .08], ["trottel", p > .1 ? .11 : 0],
-        ["bombe", p > .2 ? .035 : 0], ["flasche", .03], ["wurst", MODES[mode()].duration ? .025 : 0]
+        ["bombe", p > .2 ? (X ? .07 : .035) : 0], ["flasche", X ? .015 : .03], ["wurst", MODES[mode()].duration ? .025 : 0]
     ];
     if (ev && ev.type === "fanblock") table = [["trottel", .15], ["dicker", .1], ["trainer", .08], ["reich", .05]];
     if (ev && ev.type === "freibier") table = [["flasche", .25], ["wurst", MODES[mode()].duration ? .2 : 0], ["rb", .15]];
@@ -1374,7 +1522,7 @@ function showGuy(h, t, stay, slowOverride) {
 
 function spawn(p) {
     const busy = holes.filter(h => h.state === "up" || h.state === "hit" || h.state === "duck").length;
-    let maxUp = 1 + Math.floor(p * 3) + diff().extra + (mode() === "boss" ? 1 : 0);
+    let maxUp = 2 + Math.floor(p * 2.5) + diff().extra + (mode() === "boss" ? 1 : 0);
     if (ev && ev.type === "fanblock") maxUp += 4;
     if (boss) maxUp = Math.max(1, Math.floor(maxUp / 2));
     if (busy >= maxUp) return;
@@ -1395,7 +1543,8 @@ function spawn(p) {
     if (t === "letti") { stay = 2800; h.letti = 1; } else h.letti = 0;
     showGuy(h, t, stay);
     if (t === "idiot" && Math.random() < .2) h.duckAt = gt + stay * .35;
-    if (t === "letti") h.duelAt = gt + 900;
+    if (t === "letti") { h.duelAt = gt + 900; report("letti", 1); }
+    if (t === "praes") report("praes", 2);
 
     const lines = { idiot: LINES.idiotPop, trottel: LINES.trottelPop, dicker: LINES.dickerPop, trainer: LINES.trainerPop,
         reich: LINES.reichPop, rb: LINES.rbPop, praes: LINES.praesPop, letti: ["Voll-Speed Letti!"] }[t];
@@ -1419,6 +1568,7 @@ function escape(h) {
     else if (side === "sd") {
         stats.escaped++;
         loseCombo();
+        if (Math.random() < .3) report("escape", 0);
         if (Math.random() < .5) say(h, pick(LINES.escape), 900);
         if (mode() === "endlos") loseLife(holeCenter(h));
     }
@@ -1502,6 +1652,7 @@ function maybeDuel(l) {
     board.appendChild(el);
     l.until = Math.max(l.until, gt + 2500);
     duel = { letti: l, heimann: hm, el, until: gt + 2300 };
+    report("duel", 3);
     whistle([.12]);
 }
 function endDuel() { if (duel) { duel.el.remove(); duel = null; } }
@@ -1523,7 +1674,8 @@ function duelWin(x, y) {
     banner("VOLL-SPEED GRÄTSCHE! ×5", "small blue", 1100);
     say(l, "Voll-Speed Grätsche!", 1200);
     say(hm, "Aua, mei Schienbein!", 1200);
-    SFX.hit(); SFX.cheer();
+    SFX.hit(); SFX.cheer(); SFX.roar(.22);
+    report("duelWin", 4);
     stats.tackles++; stats.bumps++;
     lifeAdd("tackles"); if (life.tackles >= 3) unlock("graetsche");
     addCombo(); meMood("happy");
@@ -1536,6 +1688,7 @@ function duelLose() {
     if (hm.state === "up") { say(hm, "Olé! Vorbei am Letti!", 1000); hide(hm); }
     if (l.state === "up") say(l, "Zu schnell…", 900);
     loseCombo();
+    report("duelLose", 3);
 }
 
 /* ---------- Der XXXL-Horlacher ---------- */
@@ -1559,7 +1712,8 @@ function spawnBoss() {
     const max = diff().bossHp;
     boss = { el, hp: max, max, until: gt + 12000, bubble: el.querySelector(".bubble"), btok: 0 };
     banner("XXXL-HORLACHER!", "small", 1400);
-    SFX.drum(); shake(true);
+    SFX.drum(); shake(true); SFX.roar(.2);
+    report("boss", 4);
     setTimeout(() => { if (boss) bossSay(pick(LINES.bossPop), 1500); }, 600);
 }
 function bossSay(t, ms) {
@@ -1583,6 +1737,7 @@ function bossHit(x, y) {
     addCombo();
     addScore(15, x, y);
     if (Math.random() < .5) bossSay(pick(LINES.bossHit), 900);
+    report("bossHit", 1);
     if (boss.hp <= 0) bossDown(x, y);
 }
 function bossDown(x, y) {
@@ -1595,7 +1750,8 @@ function bossDown(x, y) {
     particles(x, y, 14, "", "★", 2);
     particles(x, y, 2, "schnitzel", "");
     banner("HORLACHER K.O.!", "small", 1500);
-    SFX.boom(); SFX.cheer(); confetti(50);
+    SFX.boom(); SFX.cheer(); confetti(50); chant();
+    report("bossKO", 5);
     slowmo(900);
     stats.bosses++;
     unlock("horlacher");
@@ -1605,6 +1761,7 @@ function bossDown(x, y) {
 function bossEscape() {
     banner("DR HORLACHER ISCH ABGHAUA!", "small blue", 1300);
     bossSay("Ätsch! I hol mir a Schnitzel!", 1200);
+    report("bossEsc", 4); SFX.boo();
     loseCombo();
     endBoss();
 }
@@ -1637,7 +1794,10 @@ function planEvents() {
 function startEvent(type) {
     ev = { type, until: gt + EVENTS[type].dur };
     banner(EVENTS[type].label, "small", 1300);
-    SFX.drum(); whistle([.2]);
+    SFX.drum(); whistle([.2]); SFX.roar(.18);
+    reportText({ fanblock: "Der Straßdorfer Fanblock stürmt den Platz – überall Glatzen!", pyro: "Pyro im Block! Man sieht die Hand vor Augen net!",
+        freibier: "FREIBIER! Der Vorstand spendiert a Runde!", auswechslung: "Rechberger-Ansturm! Jetzt bloß net die eigene Leut hauen!",
+        flutlicht: "Flutlicht aus! Wer hat da am Sicherungskasten rumgspielt?" }[type], 4);
     const tag = $("#evtag");
     tag.hidden = false; tag.textContent = EVENTS[type].label;
     if (type === "flutlicht") $("#dark").classList.add("show");
@@ -1715,7 +1875,11 @@ function addCombo() {
     combo++;
     stats.best = Math.max(stats.best, combo);
     const m = Math.min(5, 1 + Math.floor(combo / 5));
-    if (m > mult) { mult = m; banner(m === 5 ? "HAMMERZEIT! ×5" : "COMBO ×" + m + "!", "small", 900); SFX.boing(); }
+    if (m > mult) {
+        mult = m; banner(m === 5 ? "HAMMERZEIT! ×5" : "COMBO ×" + m + "!", "small", 900); SFX.boing();
+        if (m >= 3) { chant(); SFX.roar(.2); }
+        report(m === 5 ? "combo5" : "combo", 2);
+    }
     if (combo % 15 === 0) earnBeer();
     if (combo >= 30) unlock("combo");
 }
@@ -1730,7 +1894,8 @@ function earnBeer() {
     if (beerReady || power()) return;
     beerReady = true;
     banner("EX ODER STRASSDORF!", "small", 1400);
-    SFX.fanfare();
+    SFX.fanfare(); SFX.roar(.22);
+    report("beer", 3);
     $("#beerBtn").hidden = false;
 }
 function drinkBeer() {
@@ -1745,6 +1910,7 @@ function drinkBeer() {
     SFX.chug(); SFX.burp();
     powerUntil = gt + 5800;
     unlock("ex");
+    report("drink", 3);
     setTimeout(() => { if (running) banner("BÖÖÖRPS! STARK WIE A OCHS!", "small", 1100); }, 900);
 }
 
@@ -1770,6 +1936,7 @@ function bombBoom(h, x, y) {
     score -= 50; floatText(x, y, "−50", "neg");
     loseCombo();
     stats.bombs++;
+    report("bomb", 3); SFX.boo();
     unlock("bombe");
     holes.forEach(o => { if (o !== h && (o.state === "up" || o.state === "duck")) { hush(o); hide(o); } });
     endDuel(); cancelLetti();
@@ -1786,10 +1953,11 @@ function whack(h, x, y, chained = false) {
         h.state = "hit"; h.until = gt + 260; h.guy.classList.add("hit", "gone");
         if (t === "flasche") {
             SFX.prost();
+            report("flasche", 2);
             if (gainLife()) { burst(x, y, "PROST! +1 BIER", "gold"); }
             else { burst(x, y, "PROST!", "gold"); addScore(30, x, y); }
         } else {
-            SFX.kaching();
+            SFX.kaching(); report("wurst", 2);
             if (MODES[mode()].duration) { durExtra += 5000; burst(x, y, "+5 SEK!", "brown"); floatText(x, y, "+5 Sek"); }
             else { burst(x, y, "WURSCHT!", "brown"); addScore(50, x, y); }
         }
@@ -1803,6 +1971,7 @@ function whack(h, x, y, chained = false) {
         SFX.jail();
         say(h, "DES GIBT KNAST!", 2000);
         unlock("knast");
+        reportText(pick(REPORT.jail), 4); SFX.pfiffe();
         slowmo(900);
         endGame("jail");
         return;
@@ -1812,8 +1981,9 @@ function whack(h, x, y, chained = false) {
         const hat = h.gi.querySelector(".hat"); if (hat) hat.classList.add("off");
         score -= 30; floatText(x, y, "−30", "neg");
         loseCombo(); stats.own++; SFX.buzz();
-        if (t === "letti") { say(h, "Aua – jetzt sieh i gar nix mehr!", 1200); lettiEffect(); burst(x, y, "LETTI!", "blue"); }
-        else { say(h, pick(LINES.rbHit), 1000); burst(x, y, "EIGENTOR!", "bad"); }
+        if (t === "letti") { say(h, "Aua – jetzt sieh i gar nix mehr!", 1200); lettiEffect(); burst(x, y, "LETTI!", "blue"); report("lettiHit", 3); }
+        else { say(h, pick(LINES.rbHit), 1000); burst(x, y, "EIGENTOR!", "bad"); report("own", 3); }
+        SFX.boo(); SFX.pfiffe();
         loseLife({ x, y });
         return;
     }
@@ -1824,6 +1994,7 @@ function whack(h, x, y, chained = false) {
         const hat = h.gi.querySelector(".hat"); if (hat) hat.classList.add("off");
         SFX.klong(); burst(x, y, "KLONG!", "metal"); particles(x, y, 3, "", "★");
         say(h, pick(LINES.trottelKlong), 900);
+        report("pot", 1);
         h.until = Math.max(h.until, gt + 750);
         stats.pots++; lifeAdd("pots"); if (life.pots >= 10) unlock("topf");
         ouchAnim(h);
@@ -1836,6 +2007,7 @@ function whack(h, x, y, chained = false) {
         h.guy.classList.add(h.hp === 2 ? "b1" : "b2");
         SFX.ouch(); burst(x, y, pick(["AU!", "UFF!", "PLOPP!"]), "brown"); particles(x, y, 2, "", "★");
         say(h, pick(LINES.dickerOuch), 700);
+        report("dicker", 1);
         h.until = Math.max(h.until, gt + 800);
         ouchAnim(h);
         addCombo(); addScore(10, x, y);
@@ -1847,7 +2019,9 @@ function whack(h, x, y, chained = false) {
     h.guy.classList.add("hit");
     const hat = h.gi.querySelector(".hat"); if (hat) hat.classList.add("off");
     SFX.hit();
+    if (Math.random() < .35) SFX.roar(.09);
     stats.bumps++;
+    missStreak = 0;
     unlock("erste");
     particles(x, y, 6, "", "★");
     if (Math.random() < .2 || t === "reich") particles(x, y, t === "reich" ? 3 : 1, "tooth", "");
@@ -1862,25 +2036,28 @@ function whack(h, x, y, chained = false) {
         burst(x, y, "KA-CHING!", "gold" + mega);
         particles(x, y, 8, "bill", "€");
         say(h, pick(LINES.reichHit), 1000);
+        report("reich", 2);
     } else if (t === "dicker") {
         SFX.spit(); if (Math.random() < .4) SFX.fart();
         burst(x, y, "SCHNITZEL!", "brown mega");
         const c = holeCenter(h);
         particles(c.x, c.y + 20, 1, "schnitzel", "", 1.8);
         say(h, "Baumann tut's weh!", 1300);
+        report("schnitzel", 2); SFX.roar(.15);
         stats.schnitzel++; lifeAdd("schnitzel"); if (life.schnitzel >= 5) unlock("schnitzel");
     } else if (t === "trainer") {
         h.guy.classList.add("kreisel");
         SFX.spin();
         burst(x, y, "KREISEL!", "blue" + mega);
         say(h, pick(LINES.trainerHit), 1000);
+        report("trainer", 2);
     } else if (t === "heimann") {
         burst(x, y, pick(words), mega.trim());
         say(h, "Mei Ball!", 900);
     } else {
         burst(x, y, pick(words), mega.trim());
-        if (cry) say(h, pick(LINES.cry), 1000);
-        else if (Math.random() < .5) say(h, pick(LINES.idiotHit), 900); else hush(h);
+        if (cry) { say(h, pick(LINES.cry), 1000); report("cry", 1); }
+        else { if (Math.random() < .5) say(h, pick(LINES.idiotHit), 900); else hush(h); report("hit", 0); }
     }
     if (t === "trottel") { stats.pots += h.hp > 1 ? 1 : 0; }
     addScore(TYPES[t].pts, x, y);
@@ -1905,13 +2082,36 @@ function miss(x, y) {
     score -= 5;
     floatText(x, y + 20, "−5 " + pick(["Daneben!", "Huch!", "Luftloch!", "Wusch!", "Blind, oder?"]), "miss");
     loseCombo();
+    if (++missStreak >= 3) { missStreak = 0; report("miss", 2); }
 }
 
 /* =================================================================
    Spiel-Schleife
    ================================================================= */
 const elScore = $("#score"), elTime = $("#time"), elMult = $("#mult"), elComboLabel = $("#comboLabel"), timeStat = $("#timeStat");
+function meterSVG(frac) {
+    const h = 38 * frac, full = frac >= 1;
+    return `<svg viewBox="0 0 44 54"><defs><clipPath id="mclip"><rect x="5" y="12" width="28" height="38" rx="4"/></clipPath></defs>
+        <path d="M32 18 Q43 18 43 29 Q43 40 32 40" fill="none" stroke="#111" stroke-width="5"/>
+        <rect x="5" y="12" width="28" height="38" rx="4" fill="#fff"/>
+        <rect x="5" y="${50 - h}" width="28" height="${h}" fill="#f5b800" clip-path="url(#mclip)"/>
+        ${frac > .05 ? `<path d="M5 ${50 - h} H33" stroke="#fff" stroke-width="3" opacity=".8" clip-path="url(#mclip)"/>` : ""}
+        <rect x="5" y="12" width="28" height="38" rx="4" fill="none" ${INK} stroke-width="3"/>
+        ${full ? `<path d="M3 14 Q3 4 11 7 Q16 1 22 6 Q29 2 33 9 Q37 14 32 15 L6 15 Q3 17 3 14Z" fill="#fff" ${INK} stroke-width="2.5"/>` : ""}
+    </svg>`;
+}
+function updateMeter() {
+    const m = $("#beerMeter");
+    const showMeter = !beerReady && !power();
+    m.hidden = !showMeter;
+    if (!showMeter) { meterShown = -1; return; }
+    const n = combo % 15;
+    if (n === meterShown) return;
+    meterShown = n;
+    m.innerHTML = meterSVG(n / 15) + `<span>${n}/15</span>`;
+}
 function updateHUD() {
+    updateMeter();
     elScore.textContent = score;
     elMult.textContent = "×" + mult;
     elComboLabel.textContent = "COMBO " + combo;
@@ -1924,6 +2124,7 @@ function updateHUD() {
 }
 function loop(now) {
     if (!running) return;
+    if (paused) { last = now; requestAnimationFrame(loop); return; }
     const dt = Math.min(100, now - last) * timeScale;
     last = now;
     gt += dt;
@@ -1935,7 +2136,7 @@ function loop(now) {
     if (boss && gt >= boss.until) bossEscape();
     if (gt >= nextSpawn) {
         spawn(p);
-        let iv = lerp(850, 380, p) * diff().int * (.7 + Math.random() * .6);
+        let iv = lerp(750, 360, p) * diff().int * (.7 + Math.random() * .6);
         if (mode() === "boss") iv *= .8;
         if (mode() === "endlos" && gt > 90000) iv /= 1 + (gt - 90000) / 120000;
         if (ev && ev.type === "fanblock") iv *= .3;
@@ -1948,7 +2149,7 @@ function loop(now) {
         elTime.textContent = secs;
         if (dur) {
             timeStat.classList.toggle("danger", secs <= 10);
-            if (secs === 10 && !finalWarn && dur > 30000) { finalWarn = true; banner("SCHLUSSOFFENSIVE!", "small", 1100); }
+            if (secs === 10 && !finalWarn && dur > 30000) { finalWarn = true; banner("SCHLUSSOFFENSIVE!", "small", 1100); report("final", 4); SFX.roar(.2); }
             if (secs <= 5) SFX.tick();
         } else if (gt >= 180000) unlock("dauer");
     }
@@ -1974,6 +2175,8 @@ function loop(now) {
 function resetState() {
     score = 0; combo = 0; mult = 1; lives = 3; gt = 0; nextSpawn = 300; shownTime = -1; durExtra = 0;
     finalWarn = false; lastHitSlowmo = false; beerReady = false; powerUntil = 0; endReason = null; roundBadges = [];
+    missStreak = 0; meterShown = -1; repUntil = 0; repPrio = 0;
+    $("#reporter").textContent = "📻 Gleich geht's los…";
     stats = { bumps: 0, escaped: 0, own: 0, pots: 0, rich: 0, best: 0, schnitzel: 0, tackles: 0, bosses: 0, bombs: 0 };
     cancelLetti(); endDuel();
     if (boss) { boss.el.remove(); boss = null; }
@@ -2009,7 +2212,7 @@ function startGame() {
     seq.forEach((t, i) => setTimeout(() => {
         const lastOne = i === seq.length - 1, isIntro = intro && i === 0;
         banner(t, isIntro ? "small" : lastOne ? "go" : "", isIntro ? 1000 : 700);
-        if (lastOne) { whistle([.45]); running = true; last = performance.now(); requestAnimationFrame(loop); }
+        if (lastOne) { whistle([.45]); running = true; paused = false; last = performance.now(); requestAnimationFrame(loop); crowdStart(); SFX.roar(.2); report("start", 5); }
         else if (!isIntro) SFX.tick();
     }, 150 + i * 700 + (intro && i > 0 ? 300 : 0)));
 }
@@ -2029,7 +2232,9 @@ let lastResult = null;
 
 function endGame(reason) {
     if (!running) return;
-    running = false;
+    running = false; paused = false;
+    crowdStop();
+    if (reason === "time") { SFX.roar(.25); }
     endReason = reason;
     cancelLetti(); endDuel();
     if (boss) { const el = boss.el; boss = null; el.classList.remove("up"); setTimeout(() => el.remove(), 900); }
@@ -2060,7 +2265,7 @@ async function showEnd(reason) {
     const local = store.get("best_" + m, 0);
     const isRecord = reason !== "jail" && score > local && score > 0;
     if (isRecord) store.set("best_" + m, score);
-    const win = reason !== "jail" && (reason === "time" || (m === "endlos" && isRecord));
+    const win = reason !== "jail" && ((reason === "time" && score >= 150) || (m === "endlos" && isRecord));
 
     $("#endTitle").textContent = { time: "ABPFIFF!", nobeer: m === "endlos" ? "FEIERABEND!" : "KOI BIER MEH!", jail: "VERHAFTET!" }[reason];
     const stage = $("#endHero");
@@ -2079,7 +2284,7 @@ async function showEnd(reason) {
         if (reason === "nobeer" && m !== "endlos") comment = "Alle drei Gold-Ochsen-Krüg kaputt – Feierabend! " + comment;
         if (stats.own >= 3) comment += " Und hör endlich auf, die eigene Leut z'hauen!";
     }
-    if (win) { SFX.cheer(); setTimeout(() => confetti(), 200); } else if (reason !== "jail") SFX.trombone();
+    if (win) { SFX.cheer(); chant(); setTimeout(() => confetti(), 200); } else if (reason !== "jail") { SFX.trombone(); SFX.boo(); }
 
     $("#finalScore").textContent = score;
     $("#rank").textContent = "🏆 " + rankTitle;
@@ -2321,7 +2526,7 @@ function spot(x, y) { const d = $("#dark"); d.style.setProperty("--x", x + "px")
 document.addEventListener("pointermove", e => { if (e.pointerType !== "touch") placeHammer(e.clientX, e.clientY); spot(e.clientX, e.clientY); });
 document.addEventListener("pointerdown", e => {
     if (!document.body.classList.contains("playing")) return;
-    if (e.target.closest("#mute, #beerBtn")) return;
+    if (e.target.closest("#mute, #beerBtn, #pauseBtn")) return;
     placeHammer(e.clientX, e.clientY);
     spot(e.clientX, e.clientY);
     swing();
@@ -2360,12 +2565,53 @@ document.addEventListener("dblclick", e => e.preventDefault(), { passive: false 
 document.addEventListener("contextmenu", e => { if (playing()) e.preventDefault(); });
 window.addEventListener("resize", sizeHammer);
 
+/* ---------- Pause ---------- */
+function pauseGame() {
+    if (!running || paused) return;
+    paused = true;
+    document.body.classList.remove("playing");
+    crowdStop();
+    $("#pauseScreen").hidden = false;
+    fitTitles();
+}
+function resumeGame() {
+    if (!paused) return;
+    $("#pauseScreen").hidden = true;
+    document.body.classList.add("playing");
+    paused = false;
+    last = performance.now();
+    crowdStart();
+}
+function quitToMenu() {
+    running = false; paused = false;
+    crowdStop();
+    cancelLetti(); endDuel();
+    if (boss) { boss.el.remove(); boss = null; }
+    if (ev) endEvent();
+    holes.forEach(h => { hush(h); h.state = "down"; h.guy.className = "guy"; });
+    $("#beerBtn").hidden = true;
+    $("#lettiFx").classList.remove("show");
+    document.body.classList.remove("playing", "power");
+    $("#pauseScreen").hidden = true;
+    $("#menuScreen").hidden = false;
+    fitTitles();
+}
+$("#pauseBtn").addEventListener("click", pauseGame);
+$("#resumeBtn").addEventListener("click", resumeGame);
+$("#restartBtn").addEventListener("click", () => { running = false; paused = false; $("#pauseScreen").hidden = true; crowdStop(); startGame(); });
+$("#quitBtn").addEventListener("click", quitToMenu);
+document.addEventListener("visibilitychange", () => { if (document.hidden) pauseGame(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape" || e.key === "p") { paused ? resumeGame() : pauseGame(); } });
+
 const beerBtn = $("#beerBtn");
 beerBtn.innerHTML = mugSVG() + "<span>EXEN!</span>";
 beerBtn.addEventListener("pointerdown", e => { e.stopPropagation(); drinkBeer(); });
 const muteBtn = $("#mute");
 function renderMute() { muteBtn.textContent = muted ? "🔇" : "🔊"; }
-muteBtn.addEventListener("click", () => { muted = !muted; store.set("muted", muted); renderMute(); if (!muted) SFX.pop(); });
+muteBtn.addEventListener("click", () => {
+    muted = !muted; store.set("muted", muted); renderMute();
+    if (muted) crowdStop(); else { SFX.pop(); if (running && !paused) crowdStart(); }
+});
 renderMute();
 
 /* =================================================================
@@ -2420,7 +2666,8 @@ $("#rules").innerHTML = RULES.map(([t, n, d, c]) => `<div class="rule ${c}"><div
      <div class="rule"><div class="ic">${mugSVG()}</div><div><b>3 Gold-Ochsen-Bier</b><br>Jeder Fehler kostet oins. Alle weg = aus.</div></div>
      <div class="rule"><div class="ic">${mugSVG()}</div><div><b>Ex oder Straßdorf!</b><br>15 Treffer am Stück: Bier exen, 5 Sek. doppelt stark!</div></div>
      <div class="rule"><div class="ic">🎆</div><div><b>Ereignisse</b><br>Fanblock, Pyro, Freibier, Rechberger-Ansturm, Flutlicht aus</div></div>
-     <div class="rule"><div class="ic">💨</div><div><b>Daneben</b><br>Ins leere Loch ghauen: −5</div></div>`;
+     <div class="rule"><div class="ic">💨</div><div><b>Daneben</b><br>Ins leere Loch ghauen: −5</div></div>
+     <div class="rule"><div class="ic">⏸</div><div><b>Pause</b><br>Knopf oben links – oder einfach App wegwischen</div></div>`;
 renderBadges();
 
 $("#startBtn").addEventListener("click", startGame);
@@ -2452,6 +2699,7 @@ if (document.fonts) document.fonts.ready.then(fitTitles);
 $("#me").innerHTML = heroSVG(settings.hero, "idle");
 $("#hammer").innerHTML = weaponSVG(settings.weapon);
 renderLives();
+updateMeter();
 sizeHammer();
 </script>
 </body>

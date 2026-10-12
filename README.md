@@ -1,20 +1,25 @@
 # Hau den Straßdorfer!
 
-Ein Comic-Spiel im Browser zum Derby Rechberg gegen Straßdorf: Du bist Rechberger,
-hast eine Waffe mit Vereinslogo – und aus 12 Löchern (3×4) gucken Straßdorfer raus.
+Ein Comic-Spiel zum Derby Rechberg gegen Straßdorf – gebaut fürs iPhone: Du bist Rechberger,
+hast eine Waffe mit Vereinslogo – und aus 12 Löchern gucken Straßdorfer raus.
 
 ## Spielen
 
-`index.html` im Browser öffnen – am PC mit der Maus, auf dem Handy per Tippen.
-Alles steckt in dieser einen Datei (Logos eingebettet, Sounds werden im Browser erzeugt).
+**https://fxmz2.github.io/game/** (sobald GitHub Pages aktiviert ist) oder `index.html` im Browser öffnen.
 
-## Modi
+📱 **Tipp fürs iPhone:** In Safari auf *Teilen* → *„Zum Home-Bildschirm“* – dann startet das Spiel
+wie eine richtige App mit eigenem Symbol und ohne Browserleiste.
+
+Alles steckt in einer Datei (Logos eingebettet, Sounds werden im Browser erzeugt).
+
+## Modi & Schwierigkeit
 
 - **Standard** – 60 Sekunden, wird nach und nach schneller
 - **Boss-Modus** – 30 Sekunden Vollgas von Anfang an
-- **Endlos** – bis alle 3 Gold-Ochsen-Bierkrüge kaputt sind (Eigentor oder entwischter Straßdorfer kostet einen)
+- **Endlos** – bis alle 3 Gold-Ochsen-Bierkrüge kaputt sind
 
-Dazu Schwierigkeit (Leicht / Mittel / Schwer), 8 Figuren und 8 Waffen – alle Waffen mit Rechberg-Logo.
+Schwierigkeit: Leicht, Mittel, Schwer und **Extrem** (verdammt schwer).
+Dazu 8 Figuren und 8 Waffen – alle Waffen mit Rechberg-Logo.
 
 ## Figuren & Gegenstände
 
@@ -36,11 +41,16 @@ Dazu Schwierigkeit (Leicht / Mittel / Schwer), 8 Figuren und 8 Waffen – alle W
 
 Daneben hauen kostet 5 Punkte.
 
-**Ex oder Straßdorf!** – 15 Treffer am Stück: unten rechts ein Bier exen, dann 5 Sekunden doppelte Punkte,
-Kochtöpfe und Dicke gehen mit einem Schlag und die Schockwelle haut die Nachbarlöcher mit.
+**Bier-o-Meter & Ex oder Straßdorf!** – der Krug unten rechts füllt sich mit jedem Treffer.
+Bei 15 am Stück: Bier exen, dann 5 Sekunden doppelte Punkte und eine Schockwelle, die die Nachbarlöcher mithaut.
 
 **Ereignisse** (nicht in jeder Runde): Straßdorfer Fanblock, Pyro-Show, Freibier-Regen,
 Rechberger-Ansturm, Flutlicht aus.
+
+**Live-Reporter** vom Radio Hohenrechberg kommentiert jede Aktion, dazu **Stadion-Atmosphäre**
+mit Fan-Raunen, Jubel, Buhrufen, Pfiffen und „Olé, olé“-Gesängen.
+
+**Pause** über den Knopf oben links – oder automatisch, wenn man die App verlässt.
 
 Dazu 14 Abzeichen, eine Bestenliste (auf dem Gerät) und ein Ergebnisbild zum Teilen.
 
