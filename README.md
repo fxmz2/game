@@ -52,6 +52,16 @@ mit Fan-Raunen, Jubel, Buhrufen, Pfiffen und „Olé, olé“-Gesängen.
 
 **Pause** über den Knopf oben links – oder automatisch, wenn man die App verlässt.
 
+**Beulen-Taler & Tim Talers Strafenkatalog** – jeder Treffer bringt 1 Beulen-Taler (dazu +25 pro Abzeichen
+und pro neuem Rekord). Die Taler werden dauerhaft gespeichert; im Strafenkatalog im Menü gibt's Specials im 5er-Pack:
+
+| Special | Preis | Wirkung |
+|---|---|---|
+| 🪙 Goldene Münze | 5 Stück · 200 Taler | 20 Sekunden lang leuchtet jedes Loch 2 Sekunden vorher auf: rot = Straßdorfer, blau = Rechberger, schwarz = Bombe, grün = Bier/Wurst |
+| 🐺 Grauer Wolf | 5 Stück · 400 Taler | Bild friert ein, der Graue Wolf mit rosa Unterbüx und rosa Hammer hüpft zu jedem Straßdorfer und haut zu (gibt Punkte). Vorm XXXL-Horlacher hat er Angst und rennt weg |
+
+Pro Runde ist je eine Münze und ein Wolf einsetzbar. Runden mit Specials werden in der Bestenliste mit 🪙/🐺 markiert.
+
 Dazu 14 Abzeichen, eine Bestenliste (auf dem Gerät) und ein Ergebnisbild zum Teilen.
 
 Alle Figuren sind frei erfunden und rein comichaft.

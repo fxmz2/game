@@ -118,6 +118,42 @@ body.playing #pauseBtn{ display:block; }
 @keyframes shakeBig{ 15%{transform:translate(-14px,8px) rotate(-1deg)} 35%{transform:translate(12px,-10px) rotate(1deg)} 55%{transform:translate(-9px,-6px)} 75%{transform:translate(6px,8px)} }
 
 .hole{ position:relative; width:var(--hs); height:calc(var(--hs) * 1.2); }
+/* Goldene Münze: das Loch leuchtet 2 Sekunden vorher auf */
+.hole::before{
+    content:''; position:absolute; left:-8%; right:-8%; bottom:calc(var(--hs) * -.02); height:calc(var(--hs) * .52);
+    border-radius:50%; opacity:0; pointer-events:none; z-index:1; transition:opacity .2s;
+}
+.hole.warn-sd::before{ opacity:1; background:radial-gradient(ellipse at center, rgba(255,30,30,.95) 0, rgba(255,30,30,.55) 45%, transparent 70%); animation:warnpulse .22s infinite alternate; }
+.hole.warn-rb::before{ opacity:1; background:radial-gradient(ellipse at center, rgba(30,90,255,.95) 0, rgba(30,90,255,.55) 45%, transparent 70%); animation:warnpulse .22s infinite alternate; }
+.hole.warn-bomb::before{ opacity:1; background:radial-gradient(ellipse at center, rgba(0,0,0,.95) 0, rgba(0,0,0,.6) 45%, transparent 70%); animation:warnpulse .22s infinite alternate; }
+.hole.warn-item::before{ opacity:1; background:radial-gradient(ellipse at center, rgba(40,200,60,.95) 0, rgba(40,200,60,.5) 45%, transparent 70%); animation:warnpulse .22s infinite alternate; }
+@keyframes warnpulse{ from{ transform:scale(.85); } to{ transform:scale(1.12); } }
+
+/* Der Graue Wolf */
+.wolf{ position:absolute; left:0; top:0; z-index:20; width:calc(var(--hs) * 1.05); height:calc(var(--hs) * 1.3); pointer-events:none; }
+.wolf svg{ width:100%; height:100%; overflow:visible; display:block; }
+.wolf .wh{ transform-box:view-box; transform-origin:84px 78px; transform:rotate(-30deg); }
+.wolf.swing .wh{ animation:wswing .26s ease-out; }
+.wolf.scared svg{ animation:scared .08s steps(2) infinite; }
+.wolf .bubble{ bottom:100%; }
+@keyframes wswing{ 0%{transform:rotate(-30deg)} 45%{transform:rotate(85deg)} 100%{transform:rotate(-30deg)} }
+@keyframes scared{ from{ transform:translateX(-4px) rotate(-3deg); } to{ transform:translateX(4px) rotate(3deg); } }
+body.wolftime #board::after{
+    content:''; position:absolute; inset:-20px; z-index:4; pointer-events:none; border-radius:20px;
+    background:radial-gradient(ellipse at center, transparent 55%, rgba(120,60,140,.35) 100%);
+}
+
+/* Tim Talers Strafenkatalog */
+.shop{ display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.kasse{ font-family:var(--display); font-size:20px; letter-spacing:1px; text-align:left; margin:-2px 0 8px; }
+.ware{ background:#fff; border:3px solid var(--ink); border-radius:8px; box-shadow:3px 3px 0 var(--ink); padding:8px; display:flex; flex-direction:column; align-items:center; gap:4px; text-align:center; }
+.ware svg{ width:64px; height:64px; overflow:visible; }
+.ware b{ font-family:var(--display); font-weight:400; font-size:19px; letter-spacing:.5px; }
+.ware small{ font-size:12px; line-height:1.2; color:#333; }
+.ware .btn.small{ font-size:17px; padding:4px 12px; margin-top:4px; }
+.ware .btn.small:disabled{ opacity:.45; cursor:default; transform:none; }
+.ware .spind{ font-size:13px; font-weight:700; }
+.lbsp{ margin-left:4px; }
 .pit,.lip{ position:absolute; left:0; bottom:calc(var(--hs) * .06); width:100%; height:calc(var(--hs) * .34); overflow:visible; }
 .lip{ z-index:3; pointer-events:none; }
 .mask{ position:absolute; left:10%; width:80%; bottom:calc(var(--hs) * .15); height:var(--hs); clip-path:inset(-150% -80% 0 -80%); z-index:2; }
@@ -235,13 +271,24 @@ body.playing #pauseBtn{ display:block; }
 #me.sad{ animation:droop .9s ease-in-out; }
 @keyframes hop2{ 40%{ transform:translateY(-16px) scale(1.06); } }
 @keyframes droop{ 30%,70%{ transform:rotate(-6deg) translateY(4px); } }
-#mid{ flex:1; min-width:0; max-width:420px; align-self:center; display:flex; flex-direction:column; gap:6px; }
-#powerwrap{ text-align:center; font-family:var(--display); letter-spacing:1px; }
+#mid{ position:relative; flex:1; min-width:0; max-width:420px; align-self:center; display:flex; flex-direction:column; gap:5px; }
+#powerwrap{ position:absolute; left:0; right:0; bottom:calc(100% + 8px); text-align:center; font-family:var(--display); letter-spacing:1px; -webkit-text-stroke:.5px #fff; }
+#specials{ display:flex; gap:6px; }
+.sp{
+    flex:1; min-width:0; height:30px; padding:0 6px; cursor:pointer; white-space:nowrap; overflow:hidden;
+    font-family:var(--display); font-size:15px; letter-spacing:.5px; color:var(--ink);
+    background:var(--yellow); border:3px solid var(--ink); border-radius:16px; box-shadow:3px 3px 0 var(--ink);
+}
+.sp.spwolf{ background:#ffb3da; }
+.sp:disabled{ background:#ddd; color:#777; box-shadow:1px 1px 0 var(--ink); cursor:default; }
+.sp.active{ background:#ffd700; animation:pulse .35s infinite alternate; }
 #reporter{
     position:relative; background:#fff; border:3px solid var(--ink); border-radius:12px; box-shadow:3px 3px 0 var(--ink);
     padding:4px 8px; height:54px; overflow:hidden; text-align:left;
     font:700 13px/1.25 var(--body);
     display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical;
+}
+#mid.withsp #reporter{ height:44px; font-size:12.5px; line-height:1.2; padding-top:3px; padding-bottom:0; -webkit-line-clamp:2;
 }
 #reporter.pop{ animation:reppop .3s cubic-bezier(.2,1.6,.5,1); }
 @keyframes reppop{ from{ transform:scale(.9) rotate(-1.5deg); background:var(--yellow); } }
@@ -542,6 +589,10 @@ details.who summary{ font-family:var(--display); font-size:20px; letter-spacing:
     <footer id="bottombar">
         <div id="me" aria-hidden="true"></div>
         <div id="mid">
+            <div id="specials" hidden>
+                <button class="sp coin" id="coinBtn">🪙 Münze</button>
+                <button class="sp spwolf" id="wolfBtn">🐺 Wolf</button>
+            </div>
             <div id="powerwrap" hidden><div>STARK WIE A OCHS!</div><div id="powerbar"><i></i></div></div>
             <div id="reporter" aria-live="polite">📻 Gleich geht's los…</div>
         </div>
@@ -580,6 +631,10 @@ details.who summary{ font-family:var(--display); font-size:20px; letter-spacing:
         <div class="choices c4" id="heroChoices"></div>
         <h3>Deine Waffe</h3>
         <div class="choices c4" id="weaponChoices"></div>
+
+        <h3>Tim Talers Strafenkatalog</h3>
+        <p class="kasse" id="kasse"></p>
+        <div class="shop" id="shop"></div>
 
         <p class="tip">📱 Tipp fürs iPhone: In Safari auf <b>Teilen</b> → <b>„Zum Home-Bildschirm“</b> – dann läuft's wie a richtige App, ohne Browserleiste.</p>
 
@@ -621,6 +676,7 @@ details.who summary{ font-family:var(--display); font-size:20px; letter-spacing:
         <div class="rank" id="rank"></div>
         <p class="comment" id="comment"></p>
         <ul class="statlist" id="statlist"></ul>
+        <p class="newbadges" id="talerLine"></p>
         <p class="newbadges" id="newBadges"></p>
         <div id="endBoard"></div>
         <div class="btnrow"><button class="btn" id="againBtn">NOCHMAL!</button></div>
@@ -1282,6 +1338,7 @@ function chant() {
 const SFX = {
     roar(v = .16) { noise(1.1, v, 1100, 0, "bandpass"); noise(.9, v * .6, 2200, .08, "bandpass"); },
     boo() { [128, 136, 145, 121].forEach(f => tone({ type: "sawtooth", f0: f, f1: f * .82, dur: .9, vol: .035, vib: 6, vibF: 5 })); noise(.9, .07, 400); },
+    howl() { tone({ type: "sine", f0: 380, f1: 820, dur: .55, vol: .14, vib: 12, vibF: 6 }); tone({ type: "sine", f0: 820, f1: 520, dur: .9, vol: .14, delay: .55, vib: 18, vibF: 6 }); tone({ type: "triangle", f0: 760, f1: 1640, dur: .55, vol: .05, vib: 20, vibF: 6 }); },
     pfiffe() { [0, .16, .34].forEach(d => tone({ type: "sine", f0: 2500, f1: 3500, dur: .16, vol: .05, delay: d })); },
     hit() {
         const w = settings.weapon;
@@ -1400,6 +1457,42 @@ function toast(title, sub) {
 }
 
 /* =================================================================
+   Beulen-Taler & Tim Talers Strafenkatalog
+   ================================================================= */
+const SHOP = {
+    coin: { name: "Goldene Münze", price: 200, desc: "20 Sek. lang leuchtet jedes Loch 2 Sek. vorher auf: rot = Straßdorfer, blau = Rechberger, schwarz = Bombe." },
+    wolf: { name: "Grauer Wolf", price: 400, desc: "Bild friert ein, dr Wolf hüpft zu jedem Straßdorfer und haut zu. Vorm Horlacher hat er Angst!" }
+};
+let taler = store.get("taler", 0);
+const inv = Object.assign({ coin: 0, wolf: 0 }, store.get("inv", {}));
+let talerRound = 0;
+function saveWallet() { store.set("taler", taler); store.set("inv", inv); }
+function commitTaler() { if (talerRound > 0) { taler += talerRound; talerRound = 0; saveWallet(); } }
+function coinSVG() {
+    return `<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="28" fill="#ffd700" ${INK} stroke-width="4"/>
+        <circle cx="32" cy="32" r="20" fill="none" stroke="#c99a00" stroke-width="3"/>
+        <polygon points="${starPoints(32, 32, 13, 5.5)}" fill="#fff6b0" ${INK} stroke-width="2"/>
+        <path d="M14 20 Q20 10 32 8" stroke="#fff" stroke-width="4" fill="none" opacity=".6" stroke-linecap="round"/></svg>`;
+}
+function renderShop() {
+    $("#kasse").textContent = `💰 Kasse: ${taler} Beulen-Taler`;
+    $("#shop").innerHTML = Object.entries(SHOP).map(([k, v]) => `<div class="ware">
+        ${k === "coin" ? coinSVG() : wolfSVG(true)}
+        <b>${v.name}</b><small>${v.desc}</small>
+        <span class="spind">Im Spind: ${inv[k]} Stück</span>
+        <button class="btn small" data-buy="${k}" ${taler < v.price ? "disabled" : ""}>5 Stück · ${v.price} Taler</button></div>`).join("");
+    $$("#shop [data-buy]").forEach(b => b.addEventListener("click", () => buy(b.dataset.buy)));
+}
+function buy(k) {
+    const v = SHOP[k];
+    if (taler < v.price) return;
+    taler -= v.price; inv[k] += 5; saveWallet();
+    ac(); SFX.kaching();
+    toast("📒 Tim Taler hat's eingetragen", `5× ${v.name} – noch ${taler} Taler in der Kasse`);
+    renderShop();
+}
+
+/* =================================================================
    Abzeichen
    ================================================================= */
 const BADGES = [
@@ -1428,7 +1521,8 @@ function unlock(id) {
     store.set("badges", [...unlocked]);
     const b = BADGES.find(x => x[0] === id);
     roundBadges.push(b[3] + " " + b[1]);
-    toast("🏅 " + b[1], b[2]);
+    toast("🏅 " + b[1], b[2] + " · +25 Taler");
+    talerRound += 25;
     renderBadges();
 }
 function renderBadges() {
@@ -1472,6 +1566,7 @@ function holeFoot(h) { const hr = h.el.getBoundingClientRect(), br = board.getBo
 /* =================================================================
    Spielzustand
    ================================================================= */
+let coinUntil = 0, usedCoin = false, usedWolf = false, wolfActive = false;
 let running = false, paused = false, gt = 0, last = 0, nextSpawn = 0, durExtra = 0, missStreak = 0, meterShown = -1;
 let score = 0, combo = 0, mult = 1, lives = 3, shownTime = -1, finalWarn = false, lastHitSlowmo = false;
 let stats = {};
@@ -1521,7 +1616,7 @@ function showGuy(h, t, stay, slowOverride) {
 }
 
 function spawn(p) {
-    const busy = holes.filter(h => h.state === "up" || h.state === "hit" || h.state === "duck").length;
+    const busy = holes.filter(h => h.state === "up" || h.state === "hit" || h.state === "duck" || h.state === "pending").length;
     let maxUp = 2 + Math.floor(p * 2.5) + diff().extra + (mode() === "boss" ? 1 : 0);
     if (ev && ev.type === "fanblock") maxUp += 4;
     if (boss) maxUp = Math.max(1, Math.floor(maxUp / 2));
@@ -1533,6 +1628,19 @@ function spawn(p) {
         const withNb = free.filter(f => neighbours(f.i).some(n => holes[n].state === "down"));
         if (!withNb.length) t = "idiot"; else h = pick(withNb);
     }
+    // Goldene Münze: erst 2 Sekunden vorher farbig ankündigen
+    if (coinActive()) {
+        h.state = "pending"; h.pendT = t; h.pendAt = gt + 2000;
+        h.el.classList.add("warn-" + warnKind(t));
+        return;
+    }
+    materialize(h, t, p);
+}
+const coinActive = () => gt < coinUntil;
+function warnKind(t) { return t === "bombe" ? "bomb" : TYPES[t].side === "item" ? "item" : TYPES[t].side; }
+function clearWarn(h) { h.el.classList.remove("warn-sd", "warn-rb", "warn-bomb", "warn-item"); }
+function materialize(h, t, p) {
+    clearWarn(h);
     let stay = lerp(1500, 850, p) * stayFactor();
     if (t === "trottel") stay *= 1.35;
     if (t === "dicker") stay *= 1.6;
@@ -1697,7 +1805,7 @@ function spawnBoss() {
     if (boss) return;
     cancelLetti();
     if (duel && (BOSS_HOLES.includes(duel.letti.i) || BOSS_HOLES.includes(duel.heimann.i))) duelLose();
-    BOSS_HOLES.forEach(i => { const h = holes[i]; hush(h); h.guy.classList.remove("up", "hit"); h.state = "boss"; });
+    BOSS_HOLES.forEach(i => { const h = holes[i]; hush(h); clearWarn(h); h.guy.classList.remove("up", "hit"); h.state = "boss"; });
     const a = holes[3].el.getBoundingClientRect(), b = holes[8].el.getBoundingClientRect(), br = board.getBoundingClientRect();
     const el = document.createElement("div");
     el.className = "bosswrap";
@@ -1873,6 +1981,7 @@ function gainLife() {
 const power = () => gt < powerUntil;
 function addCombo() {
     combo++;
+    talerRound++;
     stats.best = Math.max(stats.best, combo);
     const m = Math.min(5, 1 + Math.floor(combo / 5));
     if (m > mult) {
@@ -2124,7 +2233,7 @@ function updateHUD() {
 }
 function loop(now) {
     if (!running) return;
-    if (paused) { last = now; requestAnimationFrame(loop); return; }
+    if (paused || wolfActive) { last = now; requestAnimationFrame(loop); return; }
     const dt = Math.min(100, now - last) * timeScale;
     last = now;
     gt += dt;
@@ -2165,7 +2274,9 @@ function loop(now) {
             h.duelAt = 0; maybeDuel(h);
         } else if (h.state === "up" && gt >= h.until) escape(h);
         else if (h.state === "hit" && gt >= h.until) hide(h);
+        else if (h.state === "pending" && gt >= h.pendAt) { h.state = "down"; materialize(h, h.pendT, p); }
     }
+    updateSpecials();
     if (duel && gt >= duel.until) duelLose();
     lettiTick();
     updateHUD();
@@ -2182,7 +2293,11 @@ function resetState() {
     if (boss) { boss.el.remove(); boss = null; }
     if (ev) endEvent();
     $$(".bosswrap, .duel, .walker").forEach(e => e.remove());
-    holes.forEach(h => { h.state = "down"; h.readyAt = 0; h.letti = 0; h.duckAt = 0; h.duelAt = 0; h.guy.className = "guy"; hush(h); });
+    holes.forEach(h => { h.state = "down"; h.readyAt = 0; h.letti = 0; h.duckAt = 0; h.duelAt = 0; h.guy.className = "guy"; hush(h); clearWarn(h); });
+    coinUntil = 0; usedCoin = false; usedWolf = false; wolfActive = false; talerRound = 0;
+    $$(".wolf").forEach(e => e.remove());
+    document.body.classList.remove("wolftime");
+    renderSpecials();
     $("#beerBtn").hidden = true;
     $("#lettiFx").classList.remove("show");
     document.body.classList.remove("power");
@@ -2245,8 +2360,9 @@ function endGame(reason) {
     if (reason === "jail") { setTimeout(() => showEnd(reason), 1600); return; }
     whistle([.25, .25, .8]);
     banner(reason === "nobeer" ? "KOI BIER MEH!" : "ABPFIFF!", "", 1300);
+    coinUntil = 0;
     holes.forEach((h, i) => {
-        hush(h); h.state = "down";
+        hush(h); h.state = "down"; clearWarn(h);
         setTimeout(() => {
             h.gi.innerHTML = guySVG(pick(["idiot", "idiot", "dicker", "trottel", "trainer", "reich"]));
             h.guy.className = "guy";
@@ -2264,7 +2380,10 @@ async function showEnd(reason) {
     if (reason === "time" && stats.own === 0 && stats.bumps >= 25) unlock("lamm");
     const local = store.get("best_" + m, 0);
     const isRecord = reason !== "jail" && score > local && score > 0;
-    if (isRecord) store.set("best_" + m, score);
+    if (isRecord) { store.set("best_" + m, score); talerRound += 25; }
+    const earned = talerRound;
+    commitTaler();
+    const spMark = (usedCoin ? "🪙" : "") + (usedWolf ? "🐺" : "");
     const win = reason !== "jail" && ((reason === "time" && score >= 150) || (m === "endlos" && isRecord));
 
     $("#endTitle").textContent = { time: "ABPFIFF!", nobeer: m === "endlos" ? "FEIERABEND!" : "KOI BIER MEH!", jail: "VERHAFTET!" }[reason];
@@ -2301,6 +2420,7 @@ async function showEnd(reason) {
         <li>🔥 Beste Combo: <b>${stats.best}</b></li>
         <li>💣 Bomben: <b>${stats.bombs}</b></li>`;
     $("#newBadges").textContent = roundBadges.length ? "Neue Abzeichen: " + roundBadges.join(" · ") : "";
+    $("#talerLine").textContent = `💰 +${earned} Beulen-Taler verdient – Kasse bei Tim Taler: ${taler}`;
 
     lastResult = { mode: m, score, reason, win, rankTitle, stats: { ...stats } };
     $("#endScreen").hidden = false;
@@ -2309,7 +2429,7 @@ async function showEnd(reason) {
     const eb = $("#endBoard");
     eb.innerHTML = "";
     if (reason !== "jail" && score > 0) {
-        await LB.submit(m, score, settings.diff, settings.name);
+        await LB.submit(m, score, settings.diff, settings.name, spMark);
         const list = await LB.top(m);
         eb.innerHTML = `<h3>Bestenliste ${MODES[m].label}${isRecord ? " – NEUER REKORD!" : ""}</h3>`;
         const ol = document.createElement("ol");
@@ -2339,10 +2459,10 @@ const LB = {
         return this.ready;
     },
     localList(m) { return store.get("lb_" + m, []); },
-    async submit(m, sc, df, name) {
+    async submit(m, sc, df, name, sp = "") {
         name = (name || "").trim() || "Anonymer Rechberger";
         const list = this.localList(m);
-        list.push({ name, score: sc, diff: df, t: Date.now() });
+        list.push({ name, score: sc, diff: df, sp, t: Date.now() });
         list.sort((a, b) => b.score - a.score);
         store.set("lb_" + m, list.slice(0, 20));
         await this.ready;
@@ -2352,7 +2472,7 @@ const LB = {
             const snap = await ref.get();
             const cur = snap.exists ? { ...snap.data() } : {};
             cur.name = name.slice(0, 18);
-            if (!(cur[m] >= sc)) { cur[m] = sc; cur[m + "Diff"] = df; }
+            if (!(cur[m] >= sc)) { cur[m] = sc; cur[m + "Diff"] = df; cur[m + "Sp"] = sp; }
             await ref.set(cur);
         } catch (e) { /* lokal reicht */ }
     },
@@ -2361,7 +2481,7 @@ const LB = {
         if (this.db) {
             try {
                 const snap = await this.db.collection("scores").where(m, ">", 0).orderBy(m, "desc").limit(10).get();
-                return snap.docs.map(d => { const v = d.data(); return { name: String(v.name || "Anonym"), score: v[m], diff: v[m + "Diff"], mine: d.id === this.uid }; });
+                return snap.docs.map(d => { const v = d.data(); return { name: String(v.name || "Anonym"), score: v[m], diff: v[m + "Diff"], sp: String(v[m + "Sp"] || ""), mine: d.id === this.uid }; });
             } catch (e) { /* auf lokale Liste zurückfallen */ }
         }
         return this.localList(m).slice(0, 10).map(e => ({ ...e, mine: false }));
@@ -2383,6 +2503,7 @@ function fillList(ol, list) {
         if (e.mine) li.classList.add("me");
         const pos = document.createElement("span"); pos.className = "pos"; pos.textContent = (i + 1) + ".";
         const nm = document.createElement("span"); nm.className = "nm"; nm.textContent = e.name;
+        if (e.sp) { const sp = document.createElement("span"); sp.className = "lbsp"; sp.title = "mit Specials gespielt"; sp.textContent = e.sp; nm.appendChild(sp); }
         if (e.diff && DIFFS[e.diff]) { const df = document.createElement("span"); df.className = "df"; df.textContent = DIFFS[e.diff].label; nm.appendChild(df); }
         const sc = document.createElement("span"); sc.className = "sc"; sc.textContent = e.score;
         li.append(pos, nm, sc);
@@ -2404,7 +2525,7 @@ async function openBoard(m) {
     });
     $("#boardList").innerHTML = "<li>Lade…</li>";
     fillList($("#boardList"), await LB.top(boardMode));
-    $("#boardNote").textContent = LB.note();
+    $("#boardNote").textContent = LB.note() + " 🪙/🐺 = mit Specials gespielt.";
     fitTitles();
 }
 
@@ -2526,7 +2647,8 @@ function spot(x, y) { const d = $("#dark"); d.style.setProperty("--x", x + "px")
 document.addEventListener("pointermove", e => { if (e.pointerType !== "touch") placeHammer(e.clientX, e.clientY); spot(e.clientX, e.clientY); });
 document.addEventListener("pointerdown", e => {
     if (!document.body.classList.contains("playing")) return;
-    if (e.target.closest("#mute, #beerBtn, #pauseBtn")) return;
+    if (e.target.closest("#mute, #beerBtn, #pauseBtn, .sp")) return;
+    if (wolfActive) return;
     placeHammer(e.clientX, e.clientY);
     spot(e.clientX, e.clientY);
     swing();
@@ -2565,9 +2687,172 @@ document.addEventListener("dblclick", e => e.preventDefault(), { passive: false 
 document.addEventListener("contextmenu", e => { if (playing()) e.preventDefault(); });
 window.addEventListener("resize", sizeHammer);
 
+/* ---------- Specials im Spiel ---------- */
+function renderSpecials() {
+    const any = inv.coin > 0 || inv.wolf > 0;
+    $("#specials").hidden = !any;
+    $("#mid").classList.toggle("withsp", any);
+    updateSpecials(true);
+}
+let spShown = "";
+function updateSpecials(force) {
+    const cb = $("#coinBtn"), wb = $("#wolfBtn");
+    const coinLeft = coinActive() ? Math.ceil((coinUntil - gt) / 1000) : 0;
+    const key = [inv.coin, inv.wolf, usedCoin, usedWolf, coinLeft, wolfActive].join("|");
+    if (key === spShown && !force) return;
+    spShown = key;
+    cb.textContent = coinLeft ? `🪙 ${coinLeft} s` : `🪙 Münze ×${inv.coin}`;
+    cb.classList.toggle("active", !!coinLeft);
+    cb.disabled = usedCoin || inv.coin <= 0;
+    if (coinLeft) cb.disabled = false;
+    wb.textContent = `🐺 Wolf ×${inv.wolf}`;
+    wb.disabled = usedWolf || inv.wolf <= 0 || wolfActive;
+}
+function useCoin() {
+    if (!running || paused || wolfActive || usedCoin || inv.coin <= 0) return;
+    usedCoin = true; inv.coin--; saveWallet();
+    coinUntil = gt + 20000;
+    banner("GOLDENE MÜNZE!", "small", 1200);
+    SFX.kaching(); SFX.fanfare();
+    reportText("Die Goldene Münze glänzt! Jetzt sieht er jeden Straßdorfer scho vorher kommen.", 4);
+    updateSpecials(true);
+}
+
+/* Der Graue Wolf mit rosa Unterbüx und rosa Hammer */
+function wolfSVG(small = false) {
+    const u = "wl" + (++uidN);
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 150">
+        <path d="M34 104 Q6 98 8 66 Q20 86 38 90Z" fill="#8e959e" ${INK} stroke-width="3.5"/>
+        <path d="M14 76 Q18 86 30 90" fill="none" stroke="#d9dde2" stroke-width="4" stroke-linecap="round"/>
+        <rect x="42" y="110" width="14" height="30" rx="5" fill="#8e959e" ${INK} stroke-width="3.5"/>
+        <rect x="66" y="110" width="14" height="30" rx="5" fill="#8e959e" ${INK} stroke-width="3.5"/>
+        <ellipse cx="47" cy="142" rx="11" ry="6" fill="#6f757d" ${INK} stroke-width="3"/>
+        <ellipse cx="75" cy="142" rx="11" ry="6" fill="#6f757d" ${INK} stroke-width="3"/>
+        <ellipse cx="61" cy="92" rx="28" ry="30" fill="#8e959e" ${INK} stroke-width="4"/>
+        <ellipse cx="63" cy="94" rx="16" ry="20" fill="#d9dde2"/>
+        <path d="M33 100 Q61 112 89 100 L89 116 Q76 124 68 118 L61 112 L54 118 Q46 124 33 116Z" fill="#ff8fc8" ${INK} stroke-width="3.5"/>
+        <path d="M40 104 h4 M52 108 h4 M70 108 h4 M80 104 h4" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+        <defs><clipPath id="${u}"><circle cx="61" cy="111" r="5.5"/></clipPath></defs>
+        <circle cx="61" cy="111" r="7" fill="#fff" ${INK} stroke-width="2"/>
+        <image href="${RB_LOGO}" x="55.5" y="105.5" width="11" height="11" clip-path="url(#${u})"/>
+        <path d="M40 80 Q30 92 34 100" fill="none" stroke="#111" stroke-width="10" stroke-linecap="round"/>
+        <path d="M40 80 Q30 92 34 100" fill="none" stroke="#8e959e" stroke-width="5" stroke-linecap="round"/>
+        <path d="M42 36 L38 6 L58 26Z" fill="#8e959e" ${INK} stroke-width="3.5"/><path d="M44 30 L42 14 L52 26Z" fill="#ff8fc8"/>
+        <path d="M74 26 L90 4 L88 34Z" fill="#8e959e" ${INK} stroke-width="3.5"/><path d="M78 26 L87 13 L86 30Z" fill="#ff8fc8"/>
+        <ellipse cx="62" cy="48" rx="27" ry="24" fill="#8e959e" ${INK} stroke-width="4"/>
+        <path d="M70 48 Q100 44 106 57 Q102 70 74 68Z" fill="#b9bec5" ${INK} stroke-width="3.5"/>
+        <ellipse cx="105" cy="55" rx="5.5" ry="4.5" fill="#111"/>
+        <path d="M76 64 Q90 72 104 64" fill="#6b1010" ${INK} stroke-width="3"/>
+        <path d="M82 66 l2 5 l2 -4 M94 67 l2 5 l2 -5" fill="#fff" stroke="#111" stroke-width="1"/>
+        <ellipse cx="54" cy="42" rx="7" ry="8.5" fill="#fff" ${INK} stroke-width="2.5"/><ellipse cx="72" cy="40" rx="7" ry="8.5" fill="#fff" ${INK} stroke-width="2.5"/>
+        <circle cx="57" cy="43" r="3.5" fill="#111"/><circle cx="75" cy="41" r="3.5" fill="#111"/>
+        <path d="M46 32 L60 36 M80 30 L67 35" stroke="#111" stroke-width="4" stroke-linecap="round"/>
+        <g class="wh">
+            <path d="M84 78 L100 54" stroke="#111" stroke-width="11" stroke-linecap="round"/>
+            <path d="M84 78 L100 54" stroke="#8e959e" stroke-width="6" stroke-linecap="round"/>
+            <rect x="97" y="18" width="7" height="40" rx="3" fill="#ff5fa8" ${INK} stroke-width="2.5" transform="rotate(8 100 38)"/>
+            <rect x="86" y="2" width="34" height="22" rx="6" fill="#ff8fc8" ${INK} stroke-width="3.5" transform="rotate(8 103 13)"/>
+            <path d="M92 6 v14 M114 9 v14" stroke="#fff" stroke-width="3" transform="rotate(8 103 13)"/>
+        </g>
+    </svg>`;
+}
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+function wolfPlace(w, x, y) { w._x = x; w._y = y; w.style.transform = `translate(${x - w.offsetWidth / 2}px, ${y - w.offsetHeight}px)`; }
+async function wolfHop(w, x, y, ms = 360) {
+    const fx = w._x - w.offsetWidth / 2, fy = w._y - w.offsetHeight, tx = x - w.offsetWidth / 2, ty = y - w.offsetHeight;
+    const lift = Math.max(40, w.offsetHeight * .7);
+    const a = w.animate([
+        { transform: `translate(${fx}px, ${fy}px)` },
+        { transform: `translate(${(fx + tx) / 2}px, ${Math.min(fy, ty) - lift}px) rotate(-8deg)` },
+        { transform: `translate(${tx}px, ${ty}px)` }
+    ], { duration: ms, easing: "ease-in-out" });
+    await a.finished.catch(() => {});
+    wolfPlace(w, x, y);
+}
+function wolfSay(w, t, ms = 1100) {
+    const b = w.querySelector(".bubble");
+    b.textContent = t; b.classList.add("show");
+    clearTimeout(w._bt); w._bt = setTimeout(() => b.classList.remove("show"), ms);
+}
+async function releaseWolf() {
+    if (!running || paused || wolfActive || usedWolf || inv.wolf <= 0) return;
+    usedWolf = true; inv.wolf--; saveWallet();
+    wolfActive = true;
+    updateSpecials(true);
+    document.body.classList.add("wolftime");
+    hammer.classList.remove("touchshow");
+    const br = board.getBoundingClientRect();
+    const w = document.createElement("div");
+    w.className = "wolf";
+    w.innerHTML = wolfSVG() + `<div class="bubble"></div>`;
+    board.appendChild(w);
+    wolfPlace(w, -w.offsetWidth, br.height * .55);
+    SFX.howl(); SFX.roar(.2);
+    banner("DER GRAUE WOLF!", "small", 1300);
+    reportText("Der Graue Wolf isch los! Rosa Hammer, rosa Unterbüx – Straßdorf, lauf!", 5);
+    await wolfHop(w, br.width * .18, br.height * .55, 600);
+    wolfSay(w, "AUUUUUH!", 900);
+    await sleep(500);
+    const alive = () => running && wolfActive;
+
+    if (boss) {
+        // Vorm Horlacher hat er Angst
+        await wolfHop(w, br.width * .3, br.height * .62, 400);
+        w.classList.add("scared");
+        wolfSay(w, "Ui! Dr Horlacher! MAMAAA!", 1400);
+        SFX.sob();
+        reportText("Der Wolf sieht den Horlacher… und rennt davon! Feigling mit rosa Unterbüx!", 5);
+        await sleep(1100);
+        w.classList.remove("scared");
+        const r = w.animate([{ transform: w.style.transform }, { transform: `translate(${-w.offsetWidth * 2}px, ${br.height * .55 - w.offsetHeight}px) scaleX(-1)` }], { duration: 500, easing: "ease-in" });
+        await r.finished.catch(() => {});
+        w.remove();
+        endWolf();
+        return;
+    }
+
+    // Straßdorfer aus den Löchern schnüffeln, damit er was zu tun hat
+    const free = shuffle(holes.filter(h => h.state === "down"));
+    const extra = Math.max(0, 3 - holes.filter(h => h.state === "up" && TYPES[h.type].side === "sd").length);
+    free.slice(0, extra).forEach(h => { h.letti = 0; showGuy(h, pick(["idiot", "idiot", "trottel", "dicker"]), 3000); });
+    await sleep(450);
+    const targets = holes.filter(h => h.state === "up" && TYPES[h.type].side === "sd")
+        .sort((a, b) => (Math.floor(a.i / COLS) - Math.floor(b.i / COLS)) || ((Math.floor(a.i / COLS) % 2 ? -1 : 1) * (a.i % COLS - b.i % COLS)));
+    for (const h of targets) {
+        if (!alive()) break;
+        const f = holeFoot(h);
+        await wolfHop(w, f.x - w.offsetWidth * .35, f.y - h.el.offsetHeight * .05);
+        let guard = 0;
+        while (h.state === "up" && guard++ < 4 && alive()) {
+            w.classList.remove("swing"); void w.offsetWidth; w.classList.add("swing");
+            await sleep(110);
+            const c = holeCenter(h);
+            whack(h, c.x, c.y, true);
+            await sleep(170);
+        }
+        if (Math.random() < .5) wolfSay(w, pick(["BONK!", "Grrr!", "Rosa isch die neue Härte!", "Wuff!", "Nächster!"]), 600);
+    }
+    if (alive()) {
+        wolfSay(w, "Auuuuh! Fertig!", 900);
+        SFX.howl(); chant();
+        await sleep(500);
+        await wolfHop(w, br.width + w.offsetWidth, br.height * .5, 500);
+    }
+    w.remove();
+    endWolf();
+}
+function endWolf() {
+    wolfActive = false;
+    document.body.classList.remove("wolftime");
+    last = performance.now();
+    updateSpecials(true);
+}
+$("#coinBtn").addEventListener("pointerdown", e => { e.stopPropagation(); useCoin(); });
+$("#wolfBtn").addEventListener("pointerdown", e => { e.stopPropagation(); releaseWolf(); });
+
 /* ---------- Pause ---------- */
 function pauseGame() {
-    if (!running || paused) return;
+    if (!running || paused || wolfActive) return;
     paused = true;
     document.body.classList.remove("playing");
     crowdStop();
@@ -2588,17 +2873,20 @@ function quitToMenu() {
     cancelLetti(); endDuel();
     if (boss) { boss.el.remove(); boss = null; }
     if (ev) endEvent();
-    holes.forEach(h => { hush(h); h.state = "down"; h.guy.className = "guy"; });
+    holes.forEach(h => { hush(h); h.state = "down"; h.guy.className = "guy"; clearWarn(h); });
+    $$(".wolf").forEach(e => e.remove()); wolfActive = false; document.body.classList.remove("wolftime");
+    commitTaler();
     $("#beerBtn").hidden = true;
     $("#lettiFx").classList.remove("show");
     document.body.classList.remove("playing", "power");
     $("#pauseScreen").hidden = true;
     $("#menuScreen").hidden = false;
+    renderShop();
     fitTitles();
 }
 $("#pauseBtn").addEventListener("click", pauseGame);
 $("#resumeBtn").addEventListener("click", resumeGame);
-$("#restartBtn").addEventListener("click", () => { running = false; paused = false; $("#pauseScreen").hidden = true; crowdStop(); startGame(); });
+$("#restartBtn").addEventListener("click", () => { running = false; paused = false; $("#pauseScreen").hidden = true; crowdStop(); commitTaler(); startGame(); });
 $("#quitBtn").addEventListener("click", quitToMenu);
 document.addEventListener("visibilitychange", () => { if (document.hidden) pauseGame(); });
 document.addEventListener("keydown", e => { if (e.key === "Escape" || e.key === "p") { paused ? resumeGame() : pauseGame(); } });
@@ -2667,12 +2955,14 @@ $("#rules").innerHTML = RULES.map(([t, n, d, c]) => `<div class="rule ${c}"><div
      <div class="rule"><div class="ic">${mugSVG()}</div><div><b>Ex oder Straßdorf!</b><br>15 Treffer am Stück: Bier exen, 5 Sek. doppelt stark!</div></div>
      <div class="rule"><div class="ic">🎆</div><div><b>Ereignisse</b><br>Fanblock, Pyro, Freibier, Rechberger-Ansturm, Flutlicht aus</div></div>
      <div class="rule"><div class="ic">💨</div><div><b>Daneben</b><br>Ins leere Loch ghauen: −5</div></div>
+     <div class="rule"><div class="ic">🪙</div><div><b>Beulen-Taler</b><br>1 Taler pro Treffer. Im Strafenkatalog gibt's Münze & Wolf.</div></div>
      <div class="rule"><div class="ic">⏸</div><div><b>Pause</b><br>Knopf oben links – oder einfach App wegwischen</div></div>`;
 renderBadges();
+renderShop();
 
 $("#startBtn").addEventListener("click", startGame);
 $("#againBtn").addEventListener("click", startGame);
-$("#menuBtn").addEventListener("click", () => { $("#endScreen").hidden = true; $("#menuScreen").hidden = false; fitTitles(); });
+$("#menuBtn").addEventListener("click", () => { $("#endScreen").hidden = true; $("#menuScreen").hidden = false; renderShop(); fitTitles(); });
 $("#boardBtn").addEventListener("click", () => { readMenu(); openBoard(settings.mode); });
 $("#boardClose").addEventListener("click", () => { $("#boardScreen").hidden = true; });
 $("#shareBtn").addEventListener("click", shareResult);
