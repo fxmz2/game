@@ -1785,7 +1785,7 @@ function duelWin(x, y) {
     report("duelWin", 4);
     stats.tackles++; stats.bumps++;
     lifeAdd("tackles"); if (life.tackles >= 3) unlock("graetsche");
-    addCombo(); meMood("happy");
+    addCombo(); comboTo(10); meMood("happy");
     shake(true);
 }
 function duelLose() {
@@ -1976,6 +1976,18 @@ function gainLife() {
 
 /* ---------- Kombo, Punkte, Bier-Power ---------- */
 const power = () => gt < powerUntil;
+/* Combo direkt hochsetzen (z. B. nach Lettis Grätsche) – nie nach unten */
+function comboTo(n) {
+    if (combo >= n) return;
+    const before = combo;
+    combo = n;
+    stats.best = Math.max(stats.best, combo);
+    floatText(window.innerWidth / 2, window.innerHeight * .55, "COMBO " + n + "!");
+    const m = Math.min(5, 1 + Math.floor(combo / 5));
+    if (m > mult) { mult = m; SFX.boing(); chant(); SFX.roar(.2); }
+    if (Math.floor(before / 15) < Math.floor(combo / 15)) earnBeer();
+    if (combo >= 30) unlock("combo");
+}
 function addCombo() {
     combo++;
     talerRound++;
@@ -2938,7 +2950,7 @@ const RULES = [
     ["dicker", "Dr Dicke", "3 Schläg, dann spuckt er a Schnitzel: +45", ""],
     ["trainer", "Dr Trainer", "Kreiselt beim Treffer: +20", ""],
     ["reich", "Reicher alter Sack", "Selten & flink: +50", ""],
-    ["heimann", "Heimann", "Dribbelt an Letti vorbei – Zweikampf drücken: ×5!", ""],
+    ["heimann", "Heimann", "Dribbelt an Letti vorbei – Zweikampf drücken: ×5 & Combo auf 10!", ""],
     ["rb", "Rechberger", "NET hauen! −30 & a Bier weg", "warn"],
     ["letti", "Letti", "Voll-Speed… Treffer = Letti-Effekt", "warn"],
     ["praes", "Dr Präsident", "Wer den haut, wandert in Knast!", "boss"],

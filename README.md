@@ -30,7 +30,7 @@ Dazu 8 Figuren und 8 Waffen – alle Waffen mit Rechberg-Logo.
 | Der Dicke | 3 Schläge, beim dritten spuckt er ein Schnitzel („Baumann tut's weh!“), +45 |
 | Der Trainer | kreiselt beim Treffer, +20 |
 | Reicher alter Sack | selten & flink, Geld und Gebiss fliegen, +50 |
-| Heimann | dribbelt an Letti vorbei – Zweikampf-Knopf drücken = Grätsche, 5-fache Punkte |
+| Heimann | dribbelt an Letti vorbei – Zweikampf-Knopf drücken = Grätsche, 5-fache Punkte und Combo springt auf 10 |
 | Rechberger | **nicht hauen!** −30 und ein Bier weg |
 | Letti | kommt langsam, läuft aufs nächste Feld – Treffer = Letti-Effekt (Augenklappe wandert übers Bild) |
 | Präsident | wer den haut, landet hinter schwedischen Gardinen – Runde verloren |
