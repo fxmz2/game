@@ -41,6 +41,8 @@ Dazu 8 Figuren und 8 Waffen – alle Waffen mit Rechberg-Logo.
 
 Daneben hauen kostet 5 Punkte.
 
+**Combo:** zählt jeden Treffer in Serie hoch (ab 5/10/15/20 Treffern ×2 bis ×5). Zurückgesetzt wird sie nur durch Danebenhauen, ein Eigentor oder eine Bombe – nicht durch Zeit oder entwischte Straßdorfer.
+
 **Bier-o-Meter & Ex oder Straßdorf!** – der Krug unten rechts füllt sich mit jedem Treffer.
 Bei 15 am Stück: Bier exen, dann 5 Sekunden doppelte Punkte und eine Schockwelle, die die Nachbarlöcher mithaut.
 

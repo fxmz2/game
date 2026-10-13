@@ -1675,7 +1675,6 @@ function escape(h) {
     if (side === "rb") { if (h.type === "rb" && Math.random() < .3) say(h, pick(LINES.rbLeave), 900); }
     else if (side === "sd") {
         stats.escaped++;
-        loseCombo();
         if (Math.random() < .3) report("escape", 0);
         if (Math.random() < .5) say(h, pick(LINES.escape), 900);
         if (mode() === "endlos") loseLife(holeCenter(h));
@@ -1795,7 +1794,6 @@ function duelLose() {
     endDuel();
     if (hm.state === "up") { say(hm, "Olé! Vorbei am Letti!", 1000); hide(hm); }
     if (l.state === "up") say(l, "Zu schnell…", 900);
-    loseCombo();
     report("duelLose", 3);
 }
 
@@ -1870,7 +1868,6 @@ function bossEscape() {
     banner("DR HORLACHER ISCH ABGHAUA!", "small blue", 1300);
     bossSay("Ätsch! I hol mir a Schnitzel!", 1200);
     report("bossEsc", 4); SFX.boo();
-    loseCombo();
     endBoss();
 }
 function endBoss() {
