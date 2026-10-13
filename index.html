@@ -758,6 +758,7 @@ const TYPES = {
     praes:   { side: "rb" },
     flasche: { side: "item" },
     wurst:   { side: "item" },
+    jumbo:   { side: "item" },
     bombe:   { side: "item" }
 };
 const HEROES = {
@@ -914,6 +915,16 @@ function itemSVG(type) {
         <text x="60" y="112" text-anchor="middle" font-family="Bangers, Impact, sans-serif" font-size="9" fill="#7a4a00" stroke="none">OCHSEN</text>
         <path d="M49 60 V140" stroke="#fff" stroke-width="4" opacity=".4"/></g>
         <text x="96" y="40" text-anchor="middle" font-family="Bangers, Impact, sans-serif" font-size="20" fill="#fff" stroke="#111" stroke-width="1.5">+1</text></svg>`;
+    if (type === "jumbo") return `<svg class="g" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 150">
+        <path d="M44 42 q-6 -10 0 -18 M60 38 q-6 -10 0 -20 M76 42 q-6 -10 0 -18" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity=".85"/>
+        <ellipse cx="60" cy="140" rx="54" ry="10" fill="#fff" ${INK} stroke-width="3.5"/>
+        <path d="M10 108 Q4 84 22 72 Q30 56 50 60 Q62 48 80 58 Q102 56 108 78 Q118 96 106 116 Q102 136 78 136 Q60 144 40 136 Q14 134 10 108Z" fill="#e7a94a" ${INK} stroke-width="4"/>
+        <path d="M22 100 Q30 80 50 76 M74 70 Q92 72 98 88" fill="none" stroke="#f6cf7e" stroke-width="5" stroke-linecap="round"/>
+        <g fill="#b86f22"><circle cx="30" cy="112" r="3"/><circle cx="46" cy="94" r="2.5"/><circle cx="62" cy="118" r="3"/><circle cx="78" cy="98" r="2.5"/><circle cx="94" cy="112" r="3"/><circle cx="56" cy="78" r="2"/><circle cx="40" cy="124" r="2"/><circle cx="84" cy="124" r="2.5"/></g>
+        <circle cx="94" cy="70" r="14" fill="#fff36b" ${INK} stroke-width="3"/>
+        <path d="M94 58 V82 M82 70 H106 M86 62 L102 78 M102 62 L86 78" stroke="#e6c200" stroke-width="2"/>
+        <text x="58" y="112" text-anchor="middle" font-family="Bangers, Impact, sans-serif" font-size="22" fill="#fff" stroke="#111" stroke-width="1.5">JUMBO</text>
+        <text x="60" y="20" text-anchor="middle" font-family="Bangers, Impact, sans-serif" font-size="18" fill="#ffe600" stroke="#111" stroke-width="1.5">+50</text></svg>`;
     if (type === "wurst") return `<svg class="g" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 150">
         <path d="M24 140 Q22 60 60 50 Q98 60 96 140" fill="none" stroke="#111" stroke-width="34" stroke-linecap="round"/>
         <path d="M24 140 Q22 60 60 50 Q98 60 96 140" fill="none" stroke="#c8553d" stroke-width="26" stroke-linecap="round"/>
@@ -1604,7 +1615,7 @@ function stayFactor() {
 
 function showGuy(h, t, stay, slowOverride) {
     h.type = t; h.hp = t === "trottel" ? 2 : t === "dicker" ? 3 : 1; h.state = "up"; h.until = gt + stay;
-    h.duckAt = 0; h.duelAt = 0;
+    h.duckAt = 0; h.duelAt = 0; h.jumbo = false;
     h.gi.innerHTML = guySVG(t);
     h.guy.className = "guy";
     const rise = slowOverride ? "slow" : TYPES[t].rise;
@@ -2069,7 +2080,15 @@ function whack(h, x, y, chained = false) {
     if (side === "item") {
         if (t === "bombe") { bombBoom(h, x, y); return; }
         h.state = "hit"; h.until = gt + 260; h.guy.classList.add("hit", "gone");
-        if (t === "flasche") {
+        if (t === "jumbo") {
+            score += 50;
+            floatText(x, y, "+50 JUMBO!");
+            burst(x, y, "MAHLZEIT!", "gold mega");
+            particles(x, y, 6, "", "★");
+            SFX.kaching(); SFX.roar(.15);
+            reportText(pick(["Jumbo-Schnitzel abgräumt! Mahlzeit – 50 Extrapunkte!", "Er schnappt sich des Jumbo-Schnitzel! Der Dicke guckt traurig hinterher."]), 3);
+            stats.jumbos++;
+        } else if (t === "flasche") {
             SFX.prost();
             report("flasche", 2);
             if (gainLife()) { burst(x, y, "PROST! +1 BIER", "gold"); }
@@ -2158,8 +2177,7 @@ function whack(h, x, y, chained = false) {
     } else if (t === "dicker") {
         SFX.spit(); if (Math.random() < .4) SFX.fart();
         burst(x, y, "SCHNITZEL!", "brown mega");
-        const c = holeCenter(h);
-        particles(c.x, c.y + 20, 1, "schnitzel", "", 1.8);
+        h.jumbo = true;   // nach dem Treffer verschwindet er und hinterlässt a Jumbo-Schnitzel
         say(h, "Baumann tut's weh!", 1300);
         report("schnitzel", 2); SFX.roar(.15);
         stats.schnitzel++; lifeAdd("schnitzel"); if (life.schnitzel >= 5) unlock("schnitzel");
@@ -2282,7 +2300,16 @@ function loop(now) {
         } else if (h.state === "up" && h.type === "letti" && h.duelAt && gt >= h.duelAt) {
             h.duelAt = 0; maybeDuel(h);
         } else if (h.state === "up" && gt >= h.until) escape(h);
-        else if (h.state === "hit" && gt >= h.until) hide(h);
+        else if (h.state === "hit" && gt >= h.until) {
+            if (h.jumbo) { h.jumbo = false; h.guy.classList.remove("up", "hit", "b1", "b2"); h.state = "jumbo"; h.jumboAt = gt + 380; }
+            else hide(h);
+        }
+        else if (h.state === "jumbo" && gt >= h.jumboAt) {
+            h.letti = 0;
+            showGuy(h, "jumbo", 1900 * diff().stay);
+            say(h, "Jumbo-Schnitzel! Schnell hauen!", 1100);
+            SFX.boing();
+        }
         else if (h.state === "pending" && gt >= h.pendAt) { h.state = "down"; materialize(h, h.pendT, p); }
     }
     updateSpecials();
@@ -2297,7 +2324,7 @@ function resetState() {
     finalWarn = false; lastHitSlowmo = false; beerReady = false; powerUntil = 0; endReason = null; roundBadges = [];
     missStreak = 0; meterShown = -1; repUntil = 0; repPrio = 0;
     $("#reporter").textContent = "📻 Gleich geht's los…";
-    stats = { bumps: 0, escaped: 0, own: 0, pots: 0, rich: 0, best: 0, schnitzel: 0, tackles: 0, bosses: 0, bombs: 0 };
+    stats = { bumps: 0, escaped: 0, own: 0, pots: 0, rich: 0, best: 0, schnitzel: 0, tackles: 0, bosses: 0, bombs: 0, jumbos: 0 };
     cancelLetti(); endDuel();
     if (boss) { boss.el.remove(); boss = null; }
     if (ev) endEvent();
@@ -2427,7 +2454,8 @@ async function showEnd(reason) {
         <li>🏃 Entwischt: <b>${stats.escaped}</b></li>
         <li>🙈 Eigentore: <b>${stats.own}</b></li>
         <li>🔥 Beste Combo: <b>${stats.best}</b></li>
-        <li>💣 Bomben: <b>${stats.bombs}</b></li>`;
+        <li>💣 Bomben: <b>${stats.bombs}</b></li>
+        <li>🍽️ Jumbo-Schnitzel: <b>${stats.jumbos}</b></li>`;
     $("#newBadges").textContent = roundBadges.length ? "Neue Abzeichen: " + roundBadges.join(" · ") : "";
     $("#talerLine").textContent = `💰 +${earned} Beulen-Taler verdient – Kasse bei Tim Taler: ${taler}`;
 
@@ -2947,7 +2975,8 @@ $("#playerName").addEventListener("change", readMenu);
 const RULES = [
     ["idiot", "Straßdorfer Idiot", "Blitzschnell, duckt sich manchmal weg: +10", ""],
     ["trottel", "Dorftrottel", "Kochtopf auf'm Kopf, 2 Schläg: +25", ""],
-    ["dicker", "Dr Dicke", "3 Schläg, dann spuckt er a Schnitzel: +45", ""],
+    ["dicker", "Dr Dicke", "3 Schläg, dann verschwindet er und lässt a Jumbo-Schnitzel da: +45", ""],
+    ["jumbo", "Jumbo-Schnitzel", "Kommt nach em Dicken – schnell hauen: +50 extra", ""],
     ["trainer", "Dr Trainer", "Kreiselt beim Treffer: +20", ""],
     ["reich", "Reicher alter Sack", "Selten & flink: +50", ""],
     ["heimann", "Heimann", "Dribbelt an Letti vorbei – Zweikampf drücken: ×5 & Combo auf 10!", ""],

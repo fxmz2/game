@@ -27,7 +27,8 @@ Dazu 8 Figuren und 8 Waffen – alle Waffen mit Rechberg-Logo.
 |---|---|
 | Straßdorfer Idiot | blitzschnell, duckt sich manchmal weg, +10 |
 | Dorftrottel | Kochtopf auf dem Kopf, 2 Schläge, +25 |
-| Der Dicke | 3 Schläge, beim dritten spuckt er ein Schnitzel („Baumann tut's weh!“), +45 |
+| Der Dicke | 3 Schläge („Baumann tut's weh!“), dann verschwindet er und lässt ein Jumbo-Schnitzel da, +45 |
+| Jumbo-Schnitzel | taucht nach dem Dicken im selben Loch auf – schnell hauen: +50 extra |
 | Der Trainer | kreiselt beim Treffer, +20 |
 | Reicher alter Sack | selten & flink, Geld und Gebiss fliegen, +50 |
 | Heimann | dribbelt an Letti vorbei – Zweikampf-Knopf drücken = Grätsche, 5-fache Punkte und Combo springt auf 10 |
