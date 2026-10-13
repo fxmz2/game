@@ -36,7 +36,7 @@ Dazu 8 Figuren und 8 Waffen – alle Waffen mit Rechberg-Logo.
 | Letti | kommt langsam, läuft aufs nächste Feld – Treffer = Letti-Effekt (Augenklappe wandert übers Bild) |
 | Präsident | wer den haut, landet hinter schwedischen Gardinen – Runde verloren |
 | Gold-Ochsen-Flasche | hauen = 1 Bier zurück |
-| Wurst | hauen = 5 Sekunden mehr |
+| Roccos Wurst | hauen = 5 Sekunden mehr (im Endlos-Modus +50) |
 | Bombe | **nicht hauen!** Sonst KABUMM |
 | XXXL-Horlacher | der Boss über 6 Löcher – viele Schläge bis zum K.O., +300 |
 
@@ -53,6 +53,10 @@ Rechberger-Ansturm, Flutlicht aus.
 **Live-Reporter** vom Radio Hohenrechberg kommentiert jede Aktion, dazu **Stadion-Atmosphäre**
 mit Fan-Raunen, Jubel, Buhrufen, Pfiffen und „Olé, olé“-Gesängen.
 
+**Hau den Lukas** – wer eine Runde mit 5.000 Punkten oder mehr beendet, muss noch 3 Sekunden lang so schnell
+wie möglich auf den roten Knopf hauen. Je mehr Schläge, desto höher der Bonus – 10 Stufen von +100 bis +750
+(100, 170, 240, 320, 390, 460, 530, 610, 680, 750). Bei 26 Schlägen klingelt die Glocke.
+
 **Pause** über den Knopf oben links – oder automatisch, wenn man die App verlässt.
 
 **Beulen-Taler & Tim Talers Strafenkatalog** – jeder Treffer bringt 1 Beulen-Taler (dazu +25 pro Abzeichen
@@ -60,7 +64,7 @@ und pro neuem Rekord). Die Taler werden dauerhaft gespeichert; im Strafenkatalog
 
 | Special | Preis | Wirkung |
 |---|---|---|
-| 🪙 Goldene Münze | 5 Stück · 200 Taler | 20 Sekunden lang leuchtet jedes Loch 2 Sekunden vorher auf: rot = Straßdorfer, blau = Rechberger, schwarz = Bombe, grün = Bier/Wurst |
+| 🪙 Goldene Münze | 5 Stück · 200 Taler | 20 Sekunden lang leuchtet jedes Loch 2 Sekunden vorher auf: rot = Straßdorfer, blau = Rechberger, schwarz = Bombe, grün = Bier/Roccos Wurst |
 | 🐺 Grauer Wolf | 5 Stück · 400 Taler | Bild friert ein, der Graue Wolf mit rosa Unterbüx und rosa Hammer hüpft zu jedem Straßdorfer und haut zu (gibt Punkte). Vorm XXXL-Horlacher hat er Angst und rennt weg |
 
 Pro Runde ist je eine Münze und ein Wolf einsetzbar. Runden mit Specials werden in der Bestenliste mit 🪙/🐺 markiert.
