@@ -53,9 +53,11 @@ Rechberger-Ansturm, Flutlicht aus.
 **Live-Reporter** vom Radio Hohenrechberg kommentiert jede Aktion, dazu **Stadion-Atmosphäre**
 mit Fan-Raunen, Jubel, Buhrufen, Pfiffen und „Olé, olé“-Gesängen.
 
-**Hau den Lukas** – wer eine Runde mit 5.000 Punkten oder mehr beendet, muss noch 3 Sekunden lang so schnell
-wie möglich auf den roten Knopf hauen. Je mehr Schläge, desto höher der Bonus – 10 Stufen von +100 bis +750
-(100, 170, 240, 320, 390, 460, 530, 610, 680, 750). Bei 26 Schlägen klingelt die Glocke.
+**Letti Spezial** – wer eine Runde mit 5.000 Punkten oder mehr beendet, bekommt eine kleine Cut-Szene:
+Letti redet mit sich selbst („Hey Letti!“ – „Ja Letti?“ – „Ex oder Straßdorf!“ – „Nooooi, ned schon wieder…“ –
+„Klar Letti – einmal geht noch!!“ – „Okaay!“). Danach muss er in 3 Sekunden eine Gold-Ochsen-Biersäule leer trinken –
+dafür so schnell wie möglich auf „EX!“ tippen. Säule leer = **+750**, nicht geschafft = **−500** wegen Versagen.
+Benötigte Schlucke: Leicht 15 · Mittel 18 · Schwer 22 · Extrem 27. Durch die Cut-Szene kann man vorspulen, indem man drauftippt.
 
 **Pause** über den Knopf oben links – oder automatisch, wenn man die App verlässt.
 
