@@ -53,6 +53,13 @@ Rechberger-Ansturm, Flutlicht aus.
 **Live-Reporter** vom Radio Hohenrechberg kommentiert jede Aktion, dazu **Stadion-Atmosphäre**
 mit Fan-Raunen, Jubel, Buhrufen, Pfiffen und „Olé, olé“-Gesängen.
 
+**Präsidenten-Foto** – sobald man in einer Runde die **1.884 Punkte** knackt (Gründungsjahr Rechberg), ruft der Präsident
+zum Mannschaftsfoto. Die Uhr bleibt stehen, alle 12 Löcher sind belegt: 1 Präsident, 6 Straßdorfer, 5 Rechberger.
+Dann läuft ein 3-Sekunden-Kamera-Countdown – in der Zeit so viele Straßdorfer wie möglich verhauen, jeder braucht nur
+einen Schlag und **die Punkte zählen doppelt**. Dann blitzt es und das Foto wird als Polaroid gezeigt. Sind alle
+6 Straßdorfer mit Beule drauf, gibt's **+184** extra. Aber Vorsicht: Rechberger hauen ist Eigentor, und wer den
+Präsidenten haut, landet wie immer im Knast. Einmal pro Runde.
+
 **Letti Spezial** – wer eine Runde mit 5.000 Punkten oder mehr beendet, bekommt eine kleine Cut-Szene:
 Letti redet mit sich selbst („Hey Letti!“ – „Ja Letti?“ – „Ex oder Straßdorf!“ – „Nooooi, ned schon wieder…“ –
 „Klar Letti – einmal geht noch!!“ – „Okaay!“). Danach muss er in 3 Sekunden eine Gold-Ochsen-Biersäule leer trinken –

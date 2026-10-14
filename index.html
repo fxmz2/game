@@ -143,6 +143,46 @@ body.wolftime #board::after{
     background:radial-gradient(ellipse at center, transparent 55%, rgba(120,60,140,.35) 100%);
 }
 
+/* Präsidenten-Foto (bei 1.884 Punkten) */
+#fotoFx{ position:absolute; inset:-6px; z-index:30; pointer-events:none; display:none; }
+body.fototime #fotoFx{ display:block; }
+#fotoFx .corner{ position:absolute; width:34px; height:34px; border:0 solid #fff; filter:drop-shadow(2px 2px 0 var(--ink)); }
+#fotoFx .c1{ top:0; left:0; border-top-width:6px; border-left-width:6px; }
+#fotoFx .c2{ top:0; right:0; border-top-width:6px; border-right-width:6px; }
+#fotoFx .c3{ bottom:0; left:0; border-bottom-width:6px; border-left-width:6px; }
+#fotoFx .c4{ bottom:0; right:0; border-bottom-width:6px; border-right-width:6px; }
+#fotoFx .vf{
+    position:absolute; top:8px; left:50%; transform:translateX(-50%); white-space:nowrap;
+    font-family:var(--display); font-size:18px; letter-spacing:1px; color:#fff; -webkit-text-stroke:1px var(--ink);
+    background:var(--ink); padding:3px 10px; border-radius:8px;
+}
+#fotoFx .vf::before{ content:''; display:inline-block; width:10px; height:10px; margin-right:6px; border-radius:50%; background:#ff2a2a; animation:blink .8s steps(2) infinite; }
+@keyframes blink{ 50%{ opacity:0; } }
+#fotoFx .cd{
+    position:absolute; left:50%; top:42%; transform:translate(-50%, -50%); font-family:var(--display); font-size:110px; line-height:1;
+    color:#fff; -webkit-text-stroke:4px var(--ink); text-shadow:6px 6px 0 var(--ink); opacity:0;
+}
+#fotoFx .cd.pop{ animation:cdPop .9s ease-out forwards; }
+@keyframes cdPop{ 0%{ opacity:1; transform:translate(-50%, -50%) scale(1.6); } 25%{ transform:translate(-50%, -50%) scale(1); } 70%{ opacity:1; } 100%{ opacity:.2; transform:translate(-50%, -50%) scale(.92); } }
+#fotoFx .cap{
+    position:absolute; left:-10px; right:-10px; top:100%; display:none; padding:8px 10px 10px; text-align:center;
+    background:#fff; border:3px solid var(--ink); border-top:0; border-radius:0 0 6px 6px;
+    font-family:var(--display); letter-spacing:.5px; color:var(--ink);
+}
+#fotoFx .cap b{ display:block; font-size:22px; font-weight:normal; color:#1f4fd1; }
+#fotoFx .cap span{ font-size:17px; }
+body.fotoshot #fotoFx .cap{ display:block; }
+body.fotoshot #fotoFx .corner, body.fotoshot #fotoFx .vf{ display:none; }
+body.fotoshot #board{
+    transform:translateY(-38px) rotate(-2.5deg) scale(.86); transition:transform .35s cubic-bezier(.3,1.5,.6,1);
+    background:linear-gradient(#8fd0ff 0 12%, #4fa64a 12%); border-radius:4px;
+    box-shadow:0 0 0 10px #fff, 0 0 0 13px var(--ink), 12px 14px 0 13px rgba(0,0,0,.3);
+    filter:saturate(1.25) contrast(1.05) sepia(.12);
+}
+#fotoFlash{ position:fixed; inset:0; z-index:90; background:#fff; pointer-events:none; opacity:0; }
+#fotoFlash.go{ animation:flash .7s ease-out; }
+@keyframes flash{ 0%{ opacity:1; } 100%{ opacity:0; } }
+
 /* Letti Spezial (ab 5.000 Punkten) */
 .spezial .stage{ position:relative; height:min(40vh, 300px); margin:4px auto 0; max-width:380px; }
 .spezial .cut{ position:absolute; inset:0; display:flex; justify-content:space-between; align-items:flex-end; gap:6px; }
@@ -632,6 +672,7 @@ details.who summary{ font-family:var(--display); font-size:20px; letter-spacing:
         <div id="evtag" hidden></div>
     </header>
     <main id="board"></main>
+<div id="fotoFlash"></div>
     <footer id="bottombar">
         <div id="me" aria-hidden="true"></div>
         <div id="mid">
@@ -1642,7 +1683,7 @@ function holeFoot(h) { const hr = h.el.getBoundingClientRect(), br = board.getBo
 /* =================================================================
    Spielzustand
    ================================================================= */
-let coinUntil = 0, usedCoin = false, usedWolf = false, wolfActive = false;
+let coinUntil = 0, usedCoin = false, usedWolf = false, wolfActive = false, foto = null, fotoDone = false;
 let running = false, paused = false, gt = 0, last = 0, nextSpawn = 0, durExtra = 0, missStreak = 0, meterShown = -1;
 let score = 0, combo = 0, mult = 1, lives = 3, shownTime = -1, finalWarn = false, lastHitSlowmo = false;
 let stats = {};
@@ -2079,7 +2120,7 @@ function addCombo() {
 }
 function loseCombo() { combo = 0; mult = 1; }
 function addScore(base, x, y) {
-    const pts = base * mult * (power() ? 2 : 1);
+    const pts = base * mult * (power() ? 2 : 1) * (foto && foto.phase === "shoot" ? 2 : 1);
     score += pts;
     floatText(x, y, "+" + pts);
     if (score >= 1000) unlock("tausend");
@@ -2326,6 +2367,7 @@ function updateHUD() {
 function loop(now) {
     if (!running) return;
     if (paused || wolfActive) { last = now; requestAnimationFrame(loop); return; }
+    if (foto) { fotoTick(Math.min(100, now - last)); last = now; updateHUD(); if (running) requestAnimationFrame(loop); return; }
     const dt = Math.min(100, now - last) * timeScale;
     last = now;
     gt += dt;
@@ -2378,10 +2420,99 @@ function loop(now) {
         else if (h.state === "pending" && gt >= h.pendAt) { h.state = "down"; materialize(h, h.pendT, p); }
     }
     updateSpecials();
+    if (!fotoDone && score >= FOTO_AT && !boss && !lettiRun && !duel && !ev && (!dur || dur - gt > 1500)) startFoto();
     if (duel && gt >= duel.until) duelLose();
     lettiTick();
     updateHUD();
     if (running) requestAnimationFrame(loop);
+}
+
+/* Präsidenten-Foto: bei 1.884 Punkten (Gründungsjahr Rechberg) einmal pro Runde.
+   Alle 12 Löcher voll: 1 Präsident, 6 Straßdorfer, 5 Rechberger. 3 Sekunden hauen,
+   dann wird abgedrückt. Punkte in den 3 Sekunden zählen doppelt, alle 6 erwischt = +184. */
+const FOTO_AT = 1884, FOTO_BONUS = 184;
+const FOTO_SD = ["idiot", "trottel", "dicker", "trainer", "reich", "heimann"];
+const FOTO_RB = ["rb", "rb", "rb", "rb", "letti"];
+function startFoto() {
+    fotoDone = true;
+    foto = { t: 0, phase: "intro", sd: [], praes: null, cd: 0 };
+    holes.forEach(h => {
+        hush(h); clearWarn(h); h.jumbo = false; h.duckAt = 0; h.duelAt = 0; h.letti = 0;
+        h.state = "down"; h.guy.classList.remove("up", "hit", "ouch");
+    });
+    document.body.classList.add("fototime");
+    $("#fotoFx .cd").classList.remove("pop");
+    banner("1884!", "", 1000);
+    setTimeout(() => { if (foto) banner("PRÄSIDENTEN-FOTO!", "small", 1000); }, 650);
+    SFX.fanfare(); SFX.roar(.2);
+    reportText("1884 Punkte – wie's Gründungsjahr! Der Präsident ruft zum Mannschaftsfoto – jetzt schnell no d'Straßdorfer verhauen!", 5);
+}
+function fillFoto() {
+    const order = holes.map(h => h.i).sort(() => Math.random() - .5);
+    const types = ["praes"].concat(FOTO_SD, FOTO_RB);
+    order.forEach((i, k) => {
+        const h = holes[i], t = types[k];
+        setTimeout(() => {
+            if (!foto) return;
+            showGuy(h, t, 999999);
+            h.hp = 1; h.letti = 0;
+            if (t === "praes") { foto.praes = h; say(h, "Alle lächla! Des Foto kommt in d'Vereinschronik – seit 1884!", 1800); }
+            if (TYPES[t].side === "sd") foto.sd.push(h);
+        }, k * 45);
+    });
+}
+function fotoTick(dt) {
+    const f = foto;
+    f.t += dt;
+    if (f.phase === "intro" && f.t >= 700) { f.phase = "pose"; fillFoto(); }
+    else if (f.phase === "pose" && f.t >= 1700) { f.phase = "shoot"; f.shootAt = f.t; }
+    else if (f.phase === "shoot") {
+        const left = 3000 - (f.t - f.shootAt);
+        const n = Math.max(1, Math.ceil(left / 1000));
+        if (n !== f.cd) {
+            f.cd = n;
+            const cd = $("#fotoFx .cd");
+            cd.textContent = n; cd.classList.remove("pop"); void cd.offsetWidth; cd.classList.add("pop");
+            SFX.tick();
+        }
+        if (left <= 0) snapFoto();
+    } else if (f.phase === "photo" && f.t >= f.doneAt) endFoto(false);
+}
+function snapFoto() {
+    const f = foto;
+    f.phase = "photo"; f.doneAt = f.t + 2900;
+    const fl = $("#fotoFlash"); fl.classList.remove("go"); void fl.offsetWidth; fl.classList.add("go");
+    noise(.06, .5, 4000, 0, "highpass"); tone({ type: "square", f0: 1800, f1: 600, dur: .05, vol: .12 });
+    noise(.12, .25, 2500, .09, "highpass");
+    const hits = f.sd.filter(h => h.state === "hit").length, all = hits === f.sd.length && hits > 0;
+    stats.foto = hits;
+    f.sd.filter(h => h.state === "up").forEach(h => say(h, pick(["Cheeese!", "Hihi, verwischt!", "I bin au drauf!"]), 1600));
+    let line = `${hits}/${f.sd.length} Straßdorfer verprügelt`;
+    if (all) {
+        score += FOTO_BONUS; stats.fotoBonus = FOTO_BONUS;
+        line += ` · +${FOTO_BONUS}!`;
+        const br = board.getBoundingClientRect();
+        floatText(br.left + br.width / 2, br.top + br.height / 2, `+${FOTO_BONUS} ALLE DRAUF!`);
+        setTimeout(() => { banner(`+${FOTO_BONUS}!`, "", 1300); confetti(70); chant(); SFX.roar(.25); SFX.kaching(); }, 350);
+        if (f.praes && f.praes.state === "up") say(f.praes, "Wunderbar! Des hängt mr ins Sportheim!", 2000);
+        reportText("Alle sechs Straßdorfer mit Beule aufm Foto! Des wird eingrahmt – 184 Extrapunkte!", 5);
+    } else {
+        setTimeout(() => { SFX.trombone(); }, 300);
+        if (f.praes && f.praes.state === "up") say(f.praes, "Do grinst ja no oiner – des isch koi gscheits Foto!", 2000);
+        reportText(`Klick! ${hits} von 6 Straßdorfer mit Beule – der Rest grinst frech in d'Kamera.`, 5);
+    }
+    $("#fotoFx .cap").innerHTML = `<b>RECHBERG · SEIT 1884</b><span>📸 ${line}</span>`;
+    document.body.classList.add("fotoshot");
+}
+function endFoto(silent) {
+    document.body.classList.remove("fototime", "fotoshot");
+    $("#fotoFx .cd").classList.remove("pop");
+    if (!foto) return;
+    foto = null;
+    if (silent) return;
+    holes.forEach(h => { hush(h); h.jumbo = false; if (h.state !== "down") hide(h); });
+    nextSpawn = gt + 500;
+    banner("WEITER GEHT'S!", "small", 800);
 }
 
 function resetState() {
@@ -2396,6 +2527,7 @@ function resetState() {
     $$(".bosswrap, .duel, .walker").forEach(e => e.remove());
     holes.forEach(h => { h.state = "down"; h.readyAt = 0; h.letti = 0; h.duckAt = 0; h.duelAt = 0; h.guy.className = "guy"; hush(h); clearWarn(h); });
     coinUntil = 0; usedCoin = false; usedWolf = false; wolfActive = false; talerRound = 0;
+    endFoto(true); fotoDone = false;
     $$(".wolf").forEach(e => e.remove());
     document.body.classList.remove("wolftime");
     renderSpecials();
@@ -2452,6 +2584,7 @@ function endGame(reason) {
     crowdStop();
     if (reason === "time") { SFX.roar(.25); }
     endReason = reason;
+    if (foto) endFoto(true);
     cancelLetti(); endDuel();
     if (boss) { const el = boss.el; boss = null; el.classList.remove("up"); setTimeout(() => el.remove(), 900); }
     if (ev) endEvent();
@@ -2667,6 +2800,7 @@ async function showEnd(reason) {
         <li>🔥 Beste Combo: <b>${stats.best}</b></li>
         <li>💣 Bomben: <b>${stats.bombs}</b></li>
         <li>🍽️ Jumbo-Schnitzel: <b>${stats.jumbos}</b></li>
+        ${stats.foto != null ? `<li>📸 Präsidenten-Foto: <b>${stats.foto}/6${stats.fotoBonus ? " · +" + stats.fotoBonus : ""}</b></li>` : ""}
         ${stats.spezial ? `<li>🍺 Letti Spezial: <b>${stats.spezial > 0 ? "+" + stats.spezial : "−" + -stats.spezial}</b></li>` : ""}`;
     $("#newBadges").textContent = roundBadges.length ? "Neue Abzeichen: " + roundBadges.join(" · ") : "";
     $("#talerLine").textContent = `💰 +${earned} Beulen-Taler verdient – Kasse bei Tim Taler: ${taler}`;
@@ -2907,6 +3041,7 @@ document.addEventListener("pointerdown", e => {
         touchTimer = setTimeout(() => hammer.classList.remove("touchshow"), 380);
     }
     if (!running) return;
+    if (foto && foto.phase !== "shoot") return;
     if (e.target.closest(".duel") && duel) { duelWin(e.clientX, e.clientY); return; }
     if (e.target.closest(".bosswrap") && boss) { bossHit(e.clientX, e.clientY); return; }
     if (e.target.closest(".walker") && lettiRun) {
@@ -2958,7 +3093,7 @@ function updateSpecials(force) {
     wb.disabled = usedWolf || inv.wolf <= 0 || wolfActive;
 }
 function useCoin() {
-    if (!running || paused || wolfActive || usedCoin || inv.coin <= 0) return;
+    if (!running || paused || wolfActive || foto || usedCoin || inv.coin <= 0) return;
     usedCoin = true; inv.coin--; saveWallet();
     coinUntil = gt + 20000;
     banner("GOLDENE MÜNZE!", "small", 1200);
@@ -3024,7 +3159,7 @@ function wolfSay(w, t, ms = 1100) {
     clearTimeout(w._bt); w._bt = setTimeout(() => b.classList.remove("show"), ms);
 }
 async function releaseWolf() {
-    if (!running || paused || wolfActive || usedWolf || inv.wolf <= 0) return;
+    if (!running || paused || wolfActive || foto || usedWolf || inv.wolf <= 0) return;
     usedWolf = true; inv.wolf--; saveWallet();
     wolfActive = true;
     updateSpecials(true);
@@ -3206,10 +3341,18 @@ $("#rules").innerHTML = RULES.map(([t, n, d, c]) => `<div class="rule ${c}"><div
      <div class="rule"><div class="ic">🎆</div><div><b>Ereignisse</b><br>Fanblock, Pyro, Freibier, Rechberger-Ansturm, Flutlicht aus</div></div>
      <div class="rule"><div class="ic">💨</div><div><b>Daneben</b><br>Ins leere Loch ghauen: −5</div></div>
      <div class="rule"><div class="ic">🪙</div><div><b>Beulen-Taler</b><br>1 Taler pro Treffer. Im Strafenkatalog gibt's Münze & Wolf.</div></div>
+     <div class="rule"><div class="ic">📸</div><div><b>Präsidenten-Foto</b><br>Bei 1.884 Punkten: alle Löcher voll – 3 Sek. lang d'Straßdorfer verhauen, Punkte zählen doppelt. Alle 6 erwischt = +184. Ned den Präsidenten hauen!</div></div>
      <div class="rule"><div class="ic">🍺</div><div><b>Letti Spezial</b><br>Ab 5.000 Punkten: Letti muss die Biersäule in 3 Sek. leer trinken – schnell tippen! Leer = +750, sonst −500</div></div>
      <div class="rule"><div class="ic">⏸</div><div><b>Pause</b><br>Knopf oben links – oder einfach App wegwischen</div></div>`;
 renderBadges();
 renderShop();
+{
+    const fx = document.createElement("div");
+    fx.id = "fotoFx";
+    fx.innerHTML = `<div class="corner c1"></div><div class="corner c2"></div><div class="corner c3"></div><div class="corner c4"></div>
+        <div class="vf">PRÄSIDENTEN-FOTO · SEIT 1884</div><div class="cd"></div><div class="cap"></div>`;
+    board.appendChild(fx);
+}
 
 $("#startBtn").addEventListener("click", startGame);
 $("#againBtn").addEventListener("click", startGame);
