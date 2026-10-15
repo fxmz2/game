@@ -607,6 +607,7 @@ details.who summary{ font-family:var(--display); font-size:20px; letter-spacing:
 .board-list{ list-style:none; padding:0; margin:8px 0 0; display:flex; flex-direction:column; gap:4px; text-align:left; }
 .board-list li{ display:grid; grid-template-columns:2.2em 1fr auto; gap:8px; align-items:center; background:#fff; border:2px solid var(--ink); border-radius:6px; padding:4px 10px; font-size:15px; }
 .board-list li.me{ background:var(--yellow); }
+.board-list li.gap{ display:block; background:none; border:0; padding:0; text-align:center; font-size:18px; line-height:.8; color:#555; }
 .board-list li .pos{ font-family:var(--display); font-size:20px; }
 .board-list li .nm{ min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .board-list li .sc{ font-family:var(--display); font-size:20px; font-variant-numeric:tabular-nums; }
@@ -3069,8 +3070,14 @@ async function showEnd(reason) {
         eb.innerHTML = `<h3>Bestenliste ${MODES[m].label}${isRecord ? " – NEUER REKORD!" : ""}</h3>`;
         const ol = document.createElement("ol");
         ol.className = "board-list";
-        fillList(ol, list.slice(0, 5));
+        fillList(ol, list, 5);
         eb.appendChild(ol);
+        const meRow = list.find(e => e.mine);
+        if ((LB.fb || LB.db) && meRow) {
+            const p = document.createElement("p"); p.className = "board-note";
+            p.textContent = `✅ Gespeichert – dei Bestleistung: ${meRow.score} (Platz ${meRow.rank} von ${list.length})`;
+            eb.appendChild(p);
+        }
     }
 }
 
@@ -3144,7 +3151,7 @@ const FB = {
                 from: [{ collectionId: "scores" }],
                 where: { fieldFilter: { field: { fieldPath: m }, op: "GREATER_THAN", value: { integerValue: "0" } } },
                 orderBy: [{ field: { fieldPath: m }, direction: "DESCENDING" }],
-                limit: 10
+                limit: 300
             } })
         });
         if (!r.ok) throw new Error("firestore " + r.status);
@@ -3198,21 +3205,37 @@ const LB = {
     async top(m) {
         await this.ready;
         if (this.fb) {
-            try { return await FB.top(m); } catch (e) { /* auf lokale Liste zurückfallen */ }
+            try { return rankList(await FB.top(m)); } catch (e) { /* auf lokale Liste zurückfallen */ }
         }
         if (this.db) {
             try {
-                const snap = await this.db.collection("scores").where(m, ">", 0).orderBy(m, "desc").limit(10).get();
-                return snap.docs.map(d => { const v = d.data(); return { name: String(v.name || "Anonym"), score: v[m], diff: v[m + "Diff"], sp: String(v[m + "Sp"] || ""), mine: d.id === this.uid }; });
+                const snap = await this.db.collection("scores").where(m, ">", 0).orderBy(m, "desc").limit(300).get();
+                return rankList(snap.docs.map(d => { const v = d.data(); return { name: String(v.name || "Anonym"), score: v[m], diff: v[m + "Diff"], sp: String(v[m + "Sp"] || ""), mine: d.id === this.uid }; }));
             } catch (e) { /* auf lokale Liste zurückfallen */ }
         }
-        return this.localList(m).slice(0, 10).map(e => ({ ...e, mine: false }));
+        return this.localList(m).slice(0, 10).map((e, i) => ({ ...e, mine: false, rank: i + 1 }));
     },
     note() { return this.db || this.fb ? "Gemeinsame Vereins-Bestenliste – alle sehen dieselbe Liste." : "Bestenliste auf diesem Gerät."; }
 };
 LB.init();
 
-function fillList(ol, list) {
+/* Gleicher Name = gleicher Spieler (z. B. Safari und Homescreen-App): nur die beste Leistung zählt */
+function rankList(list) {
+    const seen = new Map(), out = [];
+    for (const e of [...list].sort((a, b) => b.score - a.score)) {
+        const k = e.name.trim().toLowerCase();
+        if (/^anonym/.test(k) || k.length < 2) { out.push({ ...e }); continue; }
+        if (seen.has(k)) { if (e.mine) seen.get(k).mine = true; continue; }
+        const row = { ...e };
+        seen.set(k, row); out.push(row);
+    }
+    return out.map((e, i) => ({ ...e, rank: i + 1 }));
+}
+/* Top n anzeigen – und den eigenen Platz drunter, falls man weiter hinten steht */
+function fillList(ol, all, n = 10) {
+    const list = all.slice(0, n);
+    const me = all.find(e => e.mine);
+    if (me && me.rank > n) { if (me.rank > n + 1) list.push({ gap: true }); list.push(me); }
     ol.innerHTML = "";
     if (!list.length) {
         const li = document.createElement("li");
@@ -3222,8 +3245,9 @@ function fillList(ol, list) {
     }
     list.forEach((e, i) => {
         const li = document.createElement("li");
+        if (e.gap) { li.className = "gap"; li.textContent = "⋮"; ol.appendChild(li); return; }
         if (e.mine) li.classList.add("me");
-        const pos = document.createElement("span"); pos.className = "pos"; pos.textContent = (i + 1) + ".";
+        const pos = document.createElement("span"); pos.className = "pos"; pos.textContent = (e.rank || i + 1) + ".";
         const nm = document.createElement("span"); nm.className = "nm"; nm.textContent = e.name;
         if (e.sp) { const sp = document.createElement("span"); sp.className = "lbsp"; sp.title = "mit Specials gespielt"; sp.textContent = e.sp; nm.appendChild(sp); }
         if (e.diff && DIFFS[e.diff]) { const df = document.createElement("span"); df.className = "df"; df.textContent = DIFFS[e.diff].label; nm.appendChild(df); }
