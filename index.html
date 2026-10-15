@@ -143,6 +143,37 @@ body.wolftime #board::after{
     background:radial-gradient(ellipse at center, transparent 55%, rgba(120,60,140,.35) 100%);
 }
 
+/* Running Gags: Ali, dr Russische Zauberer, d'Polizei */
+.guy.zaub.up .gi{ animation:zaubDance .18s ease-in-out infinite alternate !important; }
+@keyframes zaubDance{ from{ transform:rotate(-10deg) translateY(0); } to{ transform:rotate(10deg) translateY(-6%); } }
+.guy.ali.up .gi{ animation:aliPuff .3s ease-in-out infinite alternate !important; }
+@keyframes aliPuff{ from{ transform:scale(1); } to{ transform:scale(1.07) translateY(-3%); } }
+#hammer.held svg{ animation:held .08s steps(2) infinite; }
+@keyframes held{ from{ transform:translate(-4px, 2px) rotate(-6deg); } to{ transform:translate(4px, -2px) rotate(6deg); } }
+#aliHold{
+    position:fixed; left:50%; top:24%; transform:translate(-50%, -50%) rotate(-4deg); z-index:60; pointer-events:none; display:none; white-space:nowrap;
+    font-family:var(--display); font-size:21px; letter-spacing:1px; color:#fff; -webkit-text-stroke:1.5px var(--ink); text-align:center;
+    background:#1f4fd1; border:4px solid var(--ink); border-radius:14px; padding:6px 14px; box-shadow:5px 5px 0 var(--ink);
+}
+#aliHold small{ display:block; font-size:14px; -webkit-text-stroke:0; }
+body.aliheld #aliHold{ display:block; animation:aliShake .12s steps(2) infinite; }
+@keyframes aliShake{ from{ transform:translate(calc(-50% - 3px), -50%) rotate(-5deg); } to{ transform:translate(calc(-50% + 3px), -50%) rotate(-3deg); } }
+#copFx{ position:fixed; inset:0; z-index:70; pointer-events:none; display:none; overflow:hidden; }
+#copFx.show{ display:block; }
+#copFx .siren{ position:absolute; inset:0; animation:siren .4s steps(2) infinite; mix-blend-mode:multiply; }
+@keyframes siren{ 0%{ background:rgba(40,90,255,.35); } 100%{ background:rgba(255,40,40,.3); } }
+#copFx .cop{ position:absolute; bottom:12%; right:-200px; width:150px; height:212px; transition:right .55s cubic-bezier(.3,1.4,.6,1); }
+#copFx.show .cop.in{ right:6%; }
+#copFx .cop svg{ width:100%; height:100%; display:block; overflow:visible; animation:jitter .12s steps(2) infinite; }
+#copFx .say{
+    position:absolute; right:4%; bottom:calc(12% + 220px); max-width:72%; padding:8px 12px;
+    font-family:var(--display); font-size:22px; line-height:1.1; letter-spacing:.5px; text-align:center;
+    background:#fff; border:3px solid var(--ink); border-radius:16px; box-shadow:4px 4px 0 var(--ink); opacity:0; transition:opacity .2s;
+}
+#copFx .say.show{ opacity:1; }
+.herostage .endcop{ position:absolute; right:-92px; bottom:0; width:96px; height:136px; }
+.herostage .endcop svg{ animation:none !important; }
+
 /* Präsidenten-Foto (bei 1.884 Punkten) */
 #fotoFx{ position:absolute; inset:-6px; z-index:30; pointer-events:none; display:none; }
 body.fototime #fotoFx{ display:block; }
@@ -673,6 +704,8 @@ details.who summary{ font-family:var(--display); font-size:20px; letter-spacing:
     </header>
     <main id="board"></main>
 <div id="fotoFlash"></div>
+<div id="aliHold">ALI HEBT DEI HAMMER FEST!<small>„Ganz ruhig, Bruder…“</small></div>
+<div id="copFx"><div class="siren"></div><div class="cop"></div><div class="say"></div></div>
     <footer id="bottombar">
         <div id="me" aria-hidden="true"></div>
         <div id="mid">
@@ -860,6 +893,8 @@ const TYPES = {
     rb:      { side: "rb" },
     letti:   { side: "rb", rise: "slow" },
     praes:   { side: "rb" },
+    ali:     { side: "rb" },
+    zauberer:{ side: "rb", rise: "fast" },
     flasche: { side: "item" },
     wurst:   { side: "item" },
     jumbo:   { side: "item" },
@@ -919,12 +954,20 @@ const LINES = {
         "Bloß net auf mi!", "Mir send die Guten!"],
     rbHit: ["Spinnsch du?!", "I bin auf DEINER Seite!", "Des sag i em Trainer!", "Falscher Kopf, Kerle!", "Du Bachel, i bin's!"],
     rbLeave: ["Danke, Kamerad!", "Puh, Glück ghabt!"],
-    praesPop: ["I bin dr Präsident!", "Respekt, bitte!", "Wehe dir!", "A Hoch auf Rechberg!", "Ruhe im Verein!"],
+    praesPop: ["Wer den Präsidenten haut, wird von dr Polizei eingeknastet!", "Wer den Präsidenten haut, wird von dr Polizei eingeknastet!", "I bin dr Präsident!", "Respekt, bitte!", "Wehe dir!", "A Hoch auf Rechberg!", "Ruhe im Verein!"],
     bossPop: ["I bin XXXL!", "Horlacher isch unkaputtbar!", "Platz da, jetzt komm i!", "Mi kriegsch net klein!"],
     bossHit: ["Des kitzelt bloß!", "Mei Ranze!", "Uff!", "Hö!", "Aua, jetzt aber!", "Hör auf, du Seggel!", "Mir wird schwindlig…"]
 };
 
 /* Der Live-Reporter vom Radio Hohenrechberg */
+const GAGS = {
+    aliPop: ["Ey! Wer hat mein Jung ghauen?!", "Lass meine Jungs in Ruh, Bruder!", "Was gucksch? Willsch Stress?", "Nomol und i komm rüber!", "Meine Jungs fasst koiner a!"],
+    aliLeave: ["I hab di im Blick, Bruder!", "Des nächste Mal bring i mei Cousins mit!", "Merk dr des!"],
+    aliHit: ["JETZT HOSCH STRESS, BRUDER!", "DU HAUSCH MI?! MI?!", "Des wirsch bereua!"],
+    zaubPop: ["Davai, davai!", "Zauberei!", "Olé!", "Hopp-hopp-hopp!", "Ball isch mei Freund!"],
+    zaubHit: ["Nyet!! FOUL!", "Gelbe Karte für di!", "Ma haut koin Zauberer!"],
+    cop: ["Polizei! Wer den Präsidenten haut, wird eingeknastet!", "Halt, Polizei! Hände weg vom Präsidenta!", "Mitkomma! Den Präsidenten haut ma net!"]
+};
 const REPORT = {
     start: ["Herzlich willkommen zum Derby! Rechberg gegen Straßdorf – des wird a Gemetzel!", "Anpfiff! Die Straßdorfer gucket scho ganz nervös aus ihre Löcher.", "Volles Haus am Hohenrechberg! Die Stimmung kocht!"],
     hit: ["Und da kracht's! Volltreffer auf die Glatze!", "Wunderbar platziert – mitten auf d'Rübe!", "Der sitzt! Des gibt a Beule wie a Gänsei!", "Klassischer Kopfball – nur andersrum!", "Hui, des hat gscheppert bis nach Gmünd!", "Sauber! Der Straßdorfer sieht Sternle!"],
@@ -1086,6 +1129,13 @@ function guySVG(type, viewBox = "0 0 120 150", staticHit = false) {
             <text x="58" y="131" transform="rotate(24 58 131)" text-anchor="middle" font-family="Bangers, Impact, sans-serif" font-size="8" fill="#111">PRÄSIDENT</text>
             <path d="M42 106 Q60 124 78 106" fill="none" stroke="#d4a017" stroke-width="4" stroke-dasharray="4 2"/>
             <circle cx="60" cy="121" r="6" fill="#ffd700" ${INK} stroke-width="2"/>`;
+    } else if (type === "ali") {
+        shirt = rbShirt() + `<path d="M40 106 Q60 126 80 106" fill="none" stroke="#111" stroke-width="7" stroke-linecap="round"/>
+            <path d="M40 106 Q60 126 80 106" fill="none" stroke="#ffd700" stroke-width="4" stroke-dasharray="4 2" stroke-linecap="round"/>` + crossedArms(skin);
+    } else if (type === "zauberer") {
+        shirt = rbShirt() + `<text x="92" y="128" text-anchor="middle" font-family="Bangers, Impact, sans-serif" font-size="16" fill="#fff" stroke="#111" stroke-width="1">10</text>
+            <g ${INK} stroke-width="3"><circle cx="24" cy="136" r="15" fill="#fff"/><polygon points="24,128 31,133 28,141 20,141 17,133" fill="#111"/></g>
+            <g fill="#ffe600" ${INK} stroke-width="1.5"><polygon points="${starPoints(104, 98, 7, 3)}"/><polygon points="${starPoints(10, 104, 6, 2.5)}"/><polygon points="${starPoints(112, 140, 5, 2)}"/></g>`;
     } else shirt = rbShirt();
 
     if (fat) headExtra = `<path d="M36 98 Q60 114 84 98" fill="none" stroke="#111" stroke-width="3"/>`;
@@ -1104,6 +1154,18 @@ function guySVG(type, viewBox = "0 0 120 150", staticHit = false) {
     if (type === "praes") hair = `<path d="M22 52 Q20 18 60 18 Q100 18 98 52 Q94 34 80 30 L50 30 Q40 26 34 32 Q26 38 22 52Z" fill="#8d8d8d" ${INK} stroke-width="3"/>
         <path d="M50 30 Q56 22 70 22" fill="none" stroke="#666" stroke-width="2"/>`;
     if (type === "rb" || type === "letti") hair = `<path d="M24 48 Q22 20 60 18 Q98 20 96 48 Q86 32 60 34 Q34 32 24 48Z" fill="#6b4423" ${INK} stroke-width="3"/>`;
+    if (type === "ali") {
+        hair = `<path d="M24 46 Q22 18 60 16 Q98 18 96 46 Q90 28 60 28 Q30 28 24 46Z" fill="#1a1a1a" ${INK} stroke-width="3"/><path d="M30 34 Q60 22 90 34" fill="none" stroke="#444" stroke-width="2"/>`;
+        beard = `<path d="M23 62 Q22 108 60 110 Q98 108 97 62 Q94 90 78 94 Q60 86 42 94 Q26 90 23 62Z" fill="#1a1a1a" ${INK} stroke-width="2.5"/>`;
+    }
+    if (type === "zauberer") {
+        hair = `<path d="M30 76 Q44 70 52 76 M68 76 Q76 70 90 76" fill="none" stroke="#c9a06a" stroke-width="5" stroke-linecap="round"/>`;
+        hat = `<g class="hat"><path d="M16 46 Q8 72 22 90 L32 84 Q24 66 30 48Z M104 46 Q112 72 98 90 L88 84 Q96 66 90 48Z" fill="#7a5230" ${INK} stroke-width="3.5"/>
+            <path d="M18 50 Q14 6 60 4 Q106 6 102 50 Q90 36 60 36 Q30 36 18 50Z" fill="#8b5e34" ${INK} stroke-width="4"/>
+            <path d="M16 48 Q20 30 60 30 Q100 30 104 48 Q90 40 60 40 Q30 40 16 48Z" fill="#c9a06a" ${INK} stroke-width="3"/>
+            <path d="M30 18 l4 6 M44 12 l3 6 M60 10 l0 6 M76 12 l-3 6 M90 18 l-4 6" stroke="#5a3b1e" stroke-width="2.5" stroke-linecap="round"/>
+            <polygon points="${starPoints(60, 22, 9, 4)}" fill="#e30613" stroke="#111" stroke-width="2"/></g>`;
+    }
 
     if (type === "trottel") {
         hat = `<g class="hat" transform="rotate(-8 60 30)">
@@ -1144,7 +1206,8 @@ function guySVG(type, viewBox = "0 0 120 150", staticHit = false) {
         trainer: `<path d="M32 40 L56 50 M88 40 L64 50" stroke="#111" stroke-width="6.5" stroke-linecap="round"/>`,
         reich: `<path d="M32 40 Q46 32 56 44 M88 44 L64 48" fill="none" stroke="#111" stroke-width="8" stroke-linecap="round"/>
                 <path d="M32 40 Q46 32 56 44 M88 44 L64 48" fill="none" stroke="#f2f2f2" stroke-width="4.5" stroke-linecap="round"/>`,
-        rb: friendly, letti: friendly, praes: friendly
+        rb: friendly, letti: friendly, praes: friendly, zauberer: friendly,
+        ali: `<path d="M30 42 L56 50 M90 42 L64 50" stroke="#111" stroke-width="8" stroke-linecap="round"/>`
     }[type];
 
     const look = side === "rb" ? 0 : (Math.random() < .5 ? -2 : 3);
@@ -1181,7 +1244,9 @@ function guySVG(type, viewBox = "0 0 120 150", staticHit = false) {
             <path d="M100 74 q5 -6 0 -11 q-5 -6 2 -12" fill="none" stroke="#9a9a9a" stroke-width="2.5" stroke-linecap="round"/>`,
         rb: `<path d="M42 84 Q60 104 78 84Z" fill="#fff" ${INK} stroke-width="3.5"/>`,
         letti: `<path d="M46 86 Q60 100 74 86" fill="none" stroke="#111" stroke-width="4" stroke-linecap="round"/><rect x="56" y="90" width="6" height="6" fill="#fff" stroke="#111" stroke-width="1.5"/>`,
-        praes: `<path d="M46 88 Q60 97 74 88" fill="none" stroke="#111" stroke-width="4" stroke-linecap="round"/>`
+        praes: `<path d="M46 88 Q60 97 74 88" fill="none" stroke="#111" stroke-width="4" stroke-linecap="round"/>`,
+        ali: `<path d="M44 84 Q60 80 76 84 Q74 102 60 104 Q46 102 44 84Z" fill="#6b1010" ${INK} stroke-width="3.5"/><path d="M47 85 Q60 82 73 85 L72 89 Q60 86 48 89Z" fill="#fff" stroke="#111" stroke-width="1.5"/>`,
+        zauberer: `<path d="M42 84 Q60 104 78 84Z" fill="#fff" ${INK} stroke-width="3.5"/><path d="M44 80 Q52 76 60 80 Q68 76 76 80" fill="none" stroke="#c9a06a" stroke-width="4" stroke-linecap="round"/>`
     }[type];
 
     const stars = [0, 120, 240].map(a => { const r = a * Math.PI / 180; return `<polygon points="${starPoints(Math.cos(r) * 34, Math.sin(r) * 34, 11, 5)}" fill="#ffe600" ${INK} stroke-width="2.5"/>`; }).join("");
@@ -1209,6 +1274,29 @@ function guySVG(type, viewBox = "0 0 120 150", staticHit = false) {
         <g class="bump"><ellipse cx="60" cy="22" rx="13" ry="11" fill="#ff8095" ${INK} stroke-width="3"/><ellipse cx="56" cy="18" rx="4" ry="2.5" fill="#fff" opacity=".7"/></g>
         ${hat}
         <g class="stars" transform="translate(60 12) scale(1 .38)"><g class="spin">${stars}</g></g>
+    </svg>`;
+}
+
+/* Dr Polizist */
+function copSVG() {
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 170">
+        <path d="M14 170 Q14 120 42 110 L78 110 Q106 120 106 170Z" fill="#2d5a8c" ${INK} stroke-width="4"/>
+        <path d="M60 112 V170" stroke="#111" stroke-width="2"/><circle cx="60" cy="130" r="3" fill="#ffd700" stroke="#111"/><circle cx="60" cy="148" r="3" fill="#ffd700" stroke="#111"/>
+        <path d="M76 124 l10 -2 l2 10 l-10 2Z" fill="#ffd700" ${INK} stroke-width="2"/>
+        <g ${INK} stroke-width="3"><circle cx="20" cy="150" r="9" fill="#c0c7d0"/><circle cx="20" cy="150" r="4" fill="#2d5a8c"/><circle cx="34" cy="158" r="9" fill="#c0c7d0"/><circle cx="34" cy="158" r="4" fill="#2d5a8c"/></g>
+        <rect x="50" y="96" width="20" height="16" fill="#f8c493" ${INK} stroke-width="3"/>
+        <ellipse cx="21" cy="70" rx="7" ry="10" fill="#f8c493" ${INK} stroke-width="3.5"/><ellipse cx="99" cy="70" rx="7" ry="10" fill="#f8c493" ${INK} stroke-width="3.5"/>
+        <ellipse cx="60" cy="66" rx="38" ry="40" fill="#f8c493" ${INK} stroke-width="4"/>
+        <path d="M32 48 L54 54 M88 48 L66 54" stroke="#111" stroke-width="5" stroke-linecap="round"/>
+        <ellipse cx="46" cy="64" rx="8" ry="9" fill="#fff" ${INK} stroke-width="3"/><ellipse cx="74" cy="64" rx="8" ry="9" fill="#fff" ${INK} stroke-width="3"/>
+        <circle cx="47" cy="66" r="3.5" fill="#111"/><circle cx="73" cy="66" r="3.5" fill="#111"/>
+        <ellipse cx="60" cy="78" rx="8" ry="7" fill="#f39b78" ${INK} stroke-width="3"/>
+        <path d="M36 88 Q48 80 60 86 Q72 80 84 88 Q72 96 60 90 Q48 96 36 88Z" fill="#4a3020" ${INK} stroke-width="2.5"/>
+        <path d="M50 98 Q60 102 70 98" fill="none" stroke="#111" stroke-width="3" stroke-linecap="round"/>
+        <path d="M20 40 Q20 10 60 8 Q100 10 100 40Z" fill="#2d5a8c" ${INK} stroke-width="4"/>
+        <path d="M14 38 H106 Q106 48 94 48 H26 Q14 48 14 38Z" fill="#111" stroke="#111" stroke-width="2"/>
+        <polygon points="${starPoints(60, 26, 9, 4)}" fill="#ffd700" stroke="#111" stroke-width="2"/>
+        <text x="60" y="160" text-anchor="middle" font-family="Bangers, Impact, sans-serif" font-size="13" fill="#fff">POLIZEI</text>
     </svg>`;
 }
 
@@ -1684,6 +1772,7 @@ function holeFoot(h) { const hr = h.el.getBoundingClientRect(), br = board.getBo
    Spielzustand
    ================================================================= */
 let coinUntil = 0, usedCoin = false, usedWolf = false, wolfActive = false, foto = null, fotoDone = false;
+let aliNext = 0, aliPending = null, holdUntil = 0, zaub = null, zaubAt = 0;
 let running = false, paused = false, gt = 0, last = 0, nextSpawn = 0, durExtra = 0, missStreak = 0, meterShown = -1;
 let score = 0, combo = 0, mult = 1, lives = 3, shownTime = -1, finalWarn = false, lastHitSlowmo = false;
 let stats = {};
@@ -1789,7 +1878,10 @@ function escape(h) {
     if (duel && duel.heimann === h) { duelLose(); return; }
     if (duel && duel.letti === h) duelLose();
     if (h.type === "letti" && h.letti === 1) { startLettiWalk(h); return; }
-    if (side === "rb") { if (h.type === "rb" && Math.random() < .3) say(h, pick(LINES.rbLeave), 900); }
+    if (side === "rb") {
+        if (h.type === "rb" && Math.random() < .3) say(h, pick(LINES.rbLeave), 900);
+        if (h.type === "ali") say(h, pick(GAGS.aliLeave), 1000);
+    }
     else if (side === "sd") {
         stats.escaped++;
         if (Math.random() < .3) report("escape", 0);
@@ -2208,6 +2300,28 @@ function whack(h, x, y, chained = false) {
     }
     shake(t === "dicker" || t === "reich" || power());
 
+    if (t === "ali") {
+        h.state = "hit"; h.until = gt + 900; h.guy.classList.add("hit");
+        score -= 50; floatText(x, y, "−50", "neg");
+        loseCombo(); stats.own++; SFX.buzz(); SFX.boo();
+        burst(x, y, "ALI-ALARM!", "bad mega");
+        say(h, pick(GAGS.aliHit), 1300);
+        reportText("Er haut den Ali! Oh-oh – jetzt wird's ungemütlich!", 4);
+        aliHold(2500);
+        loseLife({ x, y });
+        return;
+    }
+    if (t === "zauberer") {
+        h.state = "hit"; h.until = gt + 800; h.guy.classList.add("hit");
+        endZauber(h);
+        score -= 50; floatText(x, y, "−50", "neg");
+        loseCombo(); stats.own++; SFX.buzz(); SFX.pfiffe();
+        burst(x, y, "FOUL!", "bad mega");
+        say(h, pick(GAGS.zaubHit), 1300);
+        reportText("Foul am Russischen Zauberer! Des gibt Rot – wer haut denn so an Künstler?!", 4);
+        loseLife({ x, y });
+        return;
+    }
     if (t === "praes") {
         h.state = "hit"; h.until = gt + 2000; h.guy.classList.add("hit");
         burst(x, y, "VERHAFTET!", "bad mega");
@@ -2217,6 +2331,7 @@ function whack(h, x, y, chained = false) {
         reportText(pick(REPORT.jail), 4); SFX.pfiffe();
         slowmo(900);
         endGame("jail");
+        copArrives();
         return;
     }
     if (t === "rb" || t === "letti") {
@@ -2227,6 +2342,7 @@ function whack(h, x, y, chained = false) {
         if (t === "letti") { say(h, "Aua – jetzt sieh i gar nix mehr!", 1200); lettiEffect(); burst(x, y, "LETTI!", "blue"); report("lettiHit", 3); }
         else { say(h, pick(LINES.rbHit), 1000); burst(x, y, "EIGENTOR!", "bad"); report("own", 3); }
         SFX.boo(); SFX.pfiffe();
+        callAli(h);
         loseLife({ x, y });
         return;
     }
@@ -2420,11 +2536,140 @@ function loop(now) {
         else if (h.state === "pending" && gt >= h.pendAt) { h.state = "down"; materialize(h, h.pendT, p); }
     }
     updateSpecials();
-    if (!fotoDone && score >= FOTO_AT && !boss && !lettiRun && !duel && !ev && (!dur || dur - gt > 1500)) startFoto();
+    gagTick(dur);
+    if (!fotoDone && score >= FOTO_AT && !boss && !lettiRun && !duel && !ev && !zaub && (!dur || dur - gt > 1500)) startFoto();
     if (duel && gt >= duel.until) duelLose();
     lettiTick();
     updateHUD();
     if (running) requestAnimationFrame(loop);
+}
+
+/* Running Gags */
+// Ali: wer an Rechberger haut, kriegt Stress mit Ali – er taucht daneben auf und hebt dir den Hammer fest
+function callAli(victim) {
+    if (gt < aliNext || aliPending || foto || holes.some(h => h.type === "ali" && h.state === "up")) return;
+    const free = holes.filter(h => h.state === "down" && gt >= h.readyAt);
+    if (!free.length) return;
+    const nb = free.filter(h => neighbours(victim.i).includes(h.i));
+    const h = pick(nb.length ? nb : free);
+    h.state = "reserved";
+    aliPending = { h, at: gt + 550 };
+    aliNext = gt + 9000;
+}
+function aliHold(ms) {
+    holdUntil = Math.max(holdUntil, gt + ms);
+    document.body.classList.add("aliheld");
+    hammer.classList.add("held");
+    shake(true);
+}
+function spawnAli() {
+    const h = aliPending.h;
+    aliPending = null;
+    if (h.state !== "reserved") return;
+    h.state = "down";
+    showGuy(h, "ali", 3400 * Math.max(.8, diff().stay));
+    h.guy.classList.add("ali");
+    say(h, pick(GAGS.aliPop), 1500);
+    banner("ALI MACHT STRESS!", "small", 1100);
+    SFX.boing(); SFX.boo();
+    reportText(pick(["Jetzt kommt dr Ali – der lässt auf seine Jungs nix kommen!", "Ali isch da! Und er guckt gar net freundlich…", "Oha, Ali beschützt seine Jungs – jetzt gibt's Stress!"]), 4);
+    aliHold(1600);
+}
+// Dr Russische Zauberer: tänzelt mit em Ball über 4–5 Löcher hin und her – ned hauen!
+function zaubPath() {
+    for (let tries = 0; tries < 20; tries++) {
+        const free = holes.filter(h => h.state === "down" && gt >= h.readyAt);
+        if (!free.length) return null;
+        const path = [pick(free)];
+        const want = 4 + (Math.random() < .5 ? 1 : 0);
+        while (path.length < want) {
+            const lastH = path[path.length - 1];
+            const opts = neighbours(lastH.i).map(n => holes[n]).filter(o => o.state === "down" && gt >= o.readyAt && !path.includes(o));
+            if (!opts.length) break;
+            path.push(pick(opts));
+        }
+        if (path.length >= 4) return path;
+    }
+    return null;
+}
+function startZauber() {
+    const path = zaubPath();
+    if (!path) { zaubAt = gt + 2500; return; }
+    path.forEach(h => { h.state = "reserved"; hush(h); });
+    zaub = { path, idx: 0, dir: 1, hops: 0, max: 9 + Math.floor(Math.random() * 4), next: gt + 380 };
+    zaubShow(path[0]);
+    say(path[0], "Privet! Dr Zauberer isch da!", 1200);
+    banner("DER RUSSISCHE ZAUBERER!", "small", 1200);
+    SFX.fanfare(); SFX.roar(.15);
+    reportText("Achtung – dr Russische Zauberer tänzelt mit em Ball übers Feld! Bloß ned hauen!", 4);
+}
+function zaubShow(h) {
+    h.state = "down";
+    showGuy(h, "zauberer", 999999);
+    h.guy.classList.add("zaub");
+    const c = holeCenter(h);
+    particles(c.x, c.y + 20, 2, "", "✨");
+    tone({ type: "triangle", f0: 520 + Math.random() * 200, f1: 900, dur: .07, vol: .12 });
+}
+function zaubTick() {
+    if (!zaub || gt < zaub.next) return;
+    const z = zaub, cur = z.path[z.idx];
+    if (z.hops >= z.max) {
+        const c = holeCenter(cur);
+        say(cur, "Do svidanija!", 900);
+        endZauber(null);
+        burst(c.x, c.y, "OLÉ!", "blue");
+        SFX.roar(.18); chant();
+        reportText("Dr Zauberer verschwindet mit em Ball – Olé! Und koiner hat'n ghauen. Respekt.", 3);
+        stats.zauber = (stats.zauber || 0) + 1;
+        if (mode() === "endlos") zaubAt = gt + lerp(60000, 120000, Math.random());
+        return;
+    }
+    if (cur.state === "up") { cur.state = "reserved"; cur.guy.classList.remove("up"); hush(cur); }
+    let ni = z.idx + z.dir;
+    if (ni < 0 || ni >= z.path.length) { z.dir = -z.dir; ni = z.idx + z.dir; }
+    z.idx = ni;
+    const nx = z.path[ni];
+    zaubShow(nx);
+    if (Math.random() < .25) say(nx, pick(GAGS.zaubPop), 600);
+    z.hops++;
+    z.next = gt + (settings.diff === "extrem" ? 260 : 340);
+}
+function endZauber(keep) {
+    if (!zaub) return;
+    zaub.path.forEach(h => {
+        if (h === keep) return;
+        if (h.state === "reserved" || (h.state === "up" && h.type === "zauberer")) { hush(h); hide(h); }
+    });
+    zaub = null;
+}
+function gagTick(dur) {
+    if (aliPending && gt >= aliPending.at) spawnAli();
+    if (holdUntil && gt >= holdUntil) { holdUntil = 0; document.body.classList.remove("aliheld"); hammer.classList.remove("held"); }
+    if (!zaub && zaubAt && gt >= zaubAt) {
+        if (foto || boss || lettiRun || duel || (dur && dur - gt < 6000)) zaubAt = gt + 3000;
+        else { zaubAt = 0; startZauber(); }
+    }
+    zaubTick();
+}
+function cancelGags() {
+    endZauber(null);
+    if (aliPending) { if (aliPending.h.state === "reserved") aliPending.h.state = "down"; aliPending = null; }
+    holdUntil = 0;
+    document.body.classList.remove("aliheld");
+    hammer.classList.remove("held");
+}
+// D'Polizei: wer den Präsidenten haut, wird eingeknastet
+function copArrives() {
+    const fx = $("#copFx"), cop = fx.querySelector(".cop"), bubble = fx.querySelector(".say");
+    cop.innerHTML = copSVG();
+    cop.className = "cop"; bubble.className = "say";
+    bubble.textContent = pick(GAGS.cop);
+    fx.className = "show";
+    [0, .45, .9, 1.35].forEach((d, i) => tone({ type: "square", f0: i % 2 ? 700 : 950, dur: .42, vol: .07, delay: d }));
+    requestAnimationFrame(() => requestAnimationFrame(() => cop.classList.add("in")));
+    setTimeout(() => bubble.classList.add("show"), 450);
+    setTimeout(() => { fx.className = ""; cop.classList.remove("in"); bubble.classList.remove("show"); }, 2500);
 }
 
 /* Präsidenten-Foto: bei 1.884 Punkten (Gründungsjahr Rechberg) einmal pro Runde.
@@ -2435,6 +2680,7 @@ const FOTO_SD = ["idiot", "trottel", "dicker", "trainer", "reich", "heimann"];
 const FOTO_RB = ["rb", "rb", "rb", "rb", "letti"];
 function startFoto() {
     fotoDone = true;
+    cancelGags();
     foto = { t: 0, phase: "intro", sd: [], praes: null, cd: 0 };
     holes.forEach(h => {
         hush(h); clearWarn(h); h.jumbo = false; h.duckAt = 0; h.duelAt = 0; h.letti = 0;
@@ -2528,6 +2774,10 @@ function resetState() {
     holes.forEach(h => { h.state = "down"; h.readyAt = 0; h.letti = 0; h.duckAt = 0; h.duelAt = 0; h.guy.className = "guy"; hush(h); clearWarn(h); });
     coinUntil = 0; usedCoin = false; usedWolf = false; wolfActive = false; talerRound = 0;
     endFoto(true); fotoDone = false;
+    cancelGags(); aliNext = 0;
+    const zr = { standard: [15000, 45000], boss: [8000, 20000], endlos: [25000, 60000] }[mode()];
+    zaubAt = Math.random() < .6 ? lerp(zr[0], zr[1], Math.random()) : 0;
+    $("#copFx").className = ""; $("#copFx .cop").className = "cop"; $("#copFx .say").className = "say";
     $$(".wolf").forEach(e => e.remove());
     document.body.classList.remove("wolftime");
     renderSpecials();
@@ -2585,13 +2835,14 @@ function endGame(reason) {
     if (reason === "time") { SFX.roar(.25); }
     endReason = reason;
     if (foto) endFoto(true);
+    cancelGags();
     cancelLetti(); endDuel();
     if (boss) { const el = boss.el; boss = null; el.classList.remove("up"); setTimeout(() => el.remove(), 900); }
     if (ev) endEvent();
     document.body.classList.remove("power");
     $("#beerBtn").hidden = true;
     $("#lettiFx").classList.remove("show");
-    if (reason === "jail") { setTimeout(() => showEnd(reason), 1600); return; }
+    if (reason === "jail") { setTimeout(() => showEnd(reason), 2600); return; }
     whistle([.25, .25, .8]);
     banner(reason === "nobeer" ? "KOI BIER MEH!" : "ABPFIFF!", "", 1300);
     coinUntil = 0;
@@ -2769,12 +3020,12 @@ async function showEnd(reason) {
     $("#endTitle").textContent = { time: "ABPFIFF!", nobeer: m === "endlos" ? "FEIERABEND!" : "KOI BIER MEH!", jail: "VERHAFTET!" }[reason];
     const stage = $("#endHero");
     stage.className = "herostage " + (win ? "jubel" : "sad");
-    stage.innerHTML = heroSVG(settings.hero, win ? "cheer" : "sad") + (reason === "jail" ? `<div class="bars"></div>` : "") + (win ? `<div class="jubelbubble">JAAAAA!</div>` : "");
+    stage.innerHTML = heroSVG(settings.hero, win ? "cheer" : "sad") + (reason === "jail" ? `<div class="bars"></div><div class="endcop">${copSVG()}</div>` : "") + (win ? `<div class="jubelbubble">JAAAAA!</div>` : "");
 
     let rankTitle, comment;
     if (reason === "jail") {
         rankTitle = "Hinter schwedischen Gardinen";
-        comment = "Den Präsidenten haut ma net! Drei Jahr Bierverbot und Sportheim-Putzdienst. Knastbrüder kommet net in d'Bestenliste.";
+        comment = "Wer den Präsidenten haut, wird von dr Polizei eingeknastet – des hat er doch gsagt! Drei Jahr Bierverbot und Sportheim-Putzdienst. Knastbrüder kommet net in d'Bestenliste.";
         SFX.trombone();
     } else {
         let rank = RANKS[0];
@@ -2800,6 +3051,7 @@ async function showEnd(reason) {
         <li>🔥 Beste Combo: <b>${stats.best}</b></li>
         <li>💣 Bomben: <b>${stats.bombs}</b></li>
         <li>🍽️ Jumbo-Schnitzel: <b>${stats.jumbos}</b></li>
+        ${stats.zauber ? `<li>🪄 Zauberer verschont: <b>${stats.zauber}</b></li>` : ""}
         ${stats.foto != null ? `<li>📸 Präsidenten-Foto: <b>${stats.foto}/6${stats.fotoBonus ? " · +" + stats.fotoBonus : ""}</b></li>` : ""}
         ${stats.spezial ? `<li>🍺 Letti Spezial: <b>${stats.spezial > 0 ? "+" + stats.spezial : "−" + -stats.spezial}</b></li>` : ""}`;
     $("#newBadges").textContent = roundBadges.length ? "Neue Abzeichen: " + roundBadges.join(" · ") : "";
@@ -3042,6 +3294,7 @@ document.addEventListener("pointerdown", e => {
     }
     if (!running) return;
     if (foto && foto.phase !== "shoot") return;
+    if (gt < holdUntil) { floatText(e.clientX, e.clientY, pick(["Ali hebt fest!", "Lass los, Ali!", "Bruder, bitte!"]), "miss"); SFX.swish(); return; }
     if (e.target.closest(".duel") && duel) { duelWin(e.clientX, e.clientY); return; }
     if (e.target.closest(".bosswrap") && boss) { bossHit(e.clientX, e.clientY); return; }
     if (e.target.closest(".walker") && lettiRun) {
@@ -3341,6 +3594,8 @@ $("#rules").innerHTML = RULES.map(([t, n, d, c]) => `<div class="rule ${c}"><div
      <div class="rule"><div class="ic">🎆</div><div><b>Ereignisse</b><br>Fanblock, Pyro, Freibier, Rechberger-Ansturm, Flutlicht aus</div></div>
      <div class="rule"><div class="ic">💨</div><div><b>Daneben</b><br>Ins leere Loch ghauen: −5</div></div>
      <div class="rule"><div class="ic">🪙</div><div><b>Beulen-Taler</b><br>1 Taler pro Treffer. Im Strafenkatalog gibt's Münze & Wolf.</div></div>
+     <div class="rule"><div class="ic">😤</div><div><b>Ali</b><br>Wer an Rechberger haut, kriegt Stress mit Ali: er taucht auf und hebt dir kurz den Hammer fest. Ali hauen = −50!</div></div>
+     <div class="rule"><div class="ic">🪄</div><div><b>Dr Russische Zauberer</b><br>Ab und zu tänzelt er mit em Ball über 4–5 Löcher. Ned hauen – Foul = −50!</div></div>
      <div class="rule"><div class="ic">📸</div><div><b>Präsidenten-Foto</b><br>Bei 1.884 Punkten: alle Löcher voll – 3 Sek. lang d'Straßdorfer verhauen, Punkte zählen doppelt. Alle 6 erwischt = +184. Ned den Präsidenten hauen!</div></div>
      <div class="rule"><div class="ic">🍺</div><div><b>Letti Spezial</b><br>Ab 5.000 Punkten: Letti muss die Biersäule in 3 Sek. leer trinken – schnell tippen! Leer = +750, sonst −500</div></div>
      <div class="rule"><div class="ic">⏸</div><div><b>Pause</b><br>Knopf oben links – oder einfach App wegwischen</div></div>`;

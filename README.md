@@ -53,6 +53,17 @@ Rechberger-Ansturm, Flutlicht aus.
 **Live-Reporter** vom Radio Hohenrechberg kommentiert jede Aktion, dazu **Stadion-Atmosphäre**
 mit Fan-Raunen, Jubel, Buhrufen, Pfiffen und „Olé, olé“-Gesängen.
 
+**Running Gags**
+- **Dr Präsident & d'Polizei** – der Präsident warnt beim Auftauchen gern: „Wer den Präsidenten haut, wird von dr Polizei
+  eingeknastet!“ Wer's trotzdem macht: Sirene, Blaulicht, ein Polizist rennt rein – und auf dem Knast-Bildschirm steht er
+  neben der Zelle.
+- **Ali** – wer einen Rechberger (oder Letti) haut, kriegt Stress mit Ali. Er beschützt seine Jungs, taucht direkt daneben
+  auf („Ey! Wer hat mein Jung ghauen?!“) und hebt dir 1,6 Sekunden lang den Hammer fest – solange zählt kein Schlag.
+  Ali selbst hauen = −50, Combo weg und noch länger festhalten. Lässt man ihn in Ruhe, zieht er nach ein paar Sekunden ab.
+- **Dr Russische Zauberer** – Easter Egg, taucht ab und zu auf (ungefähr in jeder zweiten Runde, im Endlos-Modus öfter): mit
+  Uschanka, Nummer 10 und Ball tänzelt er blitzschnell über 4–5 Löcher hin und her. Ned hauen – Foul = −50 und Combo weg.
+  Lässt man ihn zaubern, verabschiedet er sich mit „Olé!“.
+
 **Präsidenten-Foto** – sobald man in einer Runde die **1.884 Punkte** knackt (Gründungsjahr Rechberg), ruft der Präsident
 zum Mannschaftsfoto. Die Uhr bleibt stehen, alle 12 Löcher sind belegt: 1 Präsident, 6 Straßdorfer, 5 Rechberger.
 Dann läuft ein 3-Sekunden-Kamera-Countdown – in der Zeit so viele Straßdorfer wie möglich verhauen, jeder braucht nur
