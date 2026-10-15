@@ -1,0 +1,33 @@
+rules_version = '2';
+
+// Regeln für die gemeinsame Bestenliste von „Hau den Straßdorfer!“
+// Jedes Gerät meldet sich anonym an und darf nur seinen eigenen Eintrag schreiben.
+// Lesen darf jeder (die Bestenliste ist öffentlich).
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /scores/{uid} {
+      allow read: if true;
+      allow create, update: if request.auth != null
+        && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly([
+             'name', 't',
+             'standard', 'standardDiff', 'standardSp',
+             'boss', 'bossDiff', 'bossSp',
+             'endlos', 'endlosDiff', 'endlosSp'])
+        && request.resource.data.name is string
+        && request.resource.data.name.size() <= 18
+        && okScore('standard', 30000)
+        && okScore('boss', 30000)
+        && okScore('endlos', 200000);
+      allow delete: if false;
+    }
+
+    // Punkte müssen ganze Zahlen in einem realistischen Bereich sein
+    function okScore(m, max) {
+      return !(m in request.resource.data)
+        || (request.resource.data[m] is int
+            && request.resource.data[m] > 0
+            && request.resource.data[m] <= max);
+    }
+  }
+}

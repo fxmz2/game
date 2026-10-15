@@ -89,6 +89,27 @@ und pro neuem Rekord). Die Taler werden dauerhaft gespeichert; im Strafenkatalog
 
 Pro Runde ist je eine Münze und ein Wolf einsetzbar. Runden mit Specials werden in der Bestenliste mit 🪙/🐺 markiert.
 
-Dazu 14 Abzeichen, eine Bestenliste (auf dem Gerät) und ein Ergebnisbild zum Teilen.
+Dazu 14 Abzeichen, eine Bestenliste und ein Ergebnisbild zum Teilen.
 
 Alle Figuren sind frei erfunden und rein comichaft.
+
+## Gemeinsame Bestenliste (Firebase)
+
+Ohne Einrichtung speichert die Bestenliste nur auf dem jeweiligen Gerät. Für eine gemeinsame Vereins-Bestenliste
+(ohne dass sich jemand anmelden muss) nutzt das Spiel Google Firebase – für einen Verein kostenlos.
+
+1. Auf <https://console.firebase.google.com> mit einem Google-Konto anmelden → **Projekt hinzufügen**
+   (Name z. B. `hau-den-strassdorfer`, Google Analytics kann aus bleiben).
+2. Links **Build → Authentication** → *Jetzt starten* → Reiter *Anmeldemethode* → **Anonym** aktivieren → Speichern.
+3. Links **Build → Firestore Database** → *Datenbank erstellen* → Standort `eur3 (europe-west)` →
+   *Im Produktionsmodus starten*.
+4. In Firestore den Reiter **Regeln** öffnen, alles löschen, den Inhalt der Datei [`firestore.rules`](firestore.rules)
+   einfügen → **Veröffentlichen**.
+5. Zahnrad oben links → **Projekteinstellungen** → unten bei *Meine Apps* auf das Web-Symbol `</>` →
+   App-Name eingeben → *App registrieren*. Aus dem angezeigten `firebaseConfig` werden nur `apiKey` und `projectId` gebraucht.
+6. In `index.html` die Zeile `const FIREBASE = { apiKey: "", projectId: "" };` ausfüllen und speichern.
+7. Spiel öffnen, eine Runde spielen – unter der Bestenliste steht dann „Gemeinsame Vereins-Bestenliste“.
+
+Der `apiKey` ist kein Geheimnis, er darf im Code stehen – geschützt wird über die Regeln: Jedes Gerät darf nur
+seinen eigenen Eintrag schreiben, mit Obergrenzen für Punkte und Namenslänge. Einträge kann man in der Firebase-Konsole
+unter Firestore → `scores` jederzeit von Hand löschen.

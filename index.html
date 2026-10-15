@@ -3077,19 +3077,100 @@ async function showEnd(reason) {
 /* =================================================================
    Bestenliste – gemeinsam (in der Claude-Version) oder auf dem Gerät
    ================================================================= */
+/* =================================================================
+   Gemeinsame Bestenliste über Firebase (für die GitHub-Version)
+   Werte aus der Firebase-Konsole eintragen – siehe README, Abschnitt „Gemeinsame Bestenliste“.
+   Leer lassen = Bestenliste nur auf dem Gerät.
+   ================================================================= */
+const FIREBASE = { apiKey: "", projectId: "" };
+
+const FB = {
+    on: () => !!(FIREBASE.apiKey && FIREBASE.projectId),
+    token: null, uid: null, exp: 0,
+    async auth() {
+        if (this.token && Date.now() < this.exp) return true;
+        const k = FIREBASE.apiKey, rt = store.get("fb_refresh", null);
+        let r;
+        if (rt) {
+            r = await fetch(`https://securetoken.googleapis.com/v1/token?key=${k}`, {
+                method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: "grant_type=refresh_token&refresh_token=" + encodeURIComponent(rt)
+            });
+            if (r.ok) {
+                const d = await r.json();
+                this.token = d.id_token; this.uid = d.user_id; this.exp = Date.now() + (d.expires_in - 60) * 1000;
+                store.set("fb_refresh", d.refresh_token);
+                return true;
+            }
+        }
+        r = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${k}`, {
+            method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ returnSecureToken: true })
+        });
+        if (!r.ok) return false;
+        const d = await r.json();
+        this.token = d.idToken; this.uid = d.localId; this.exp = Date.now() + (d.expiresIn - 60) * 1000;
+        store.set("fb_refresh", d.refreshToken);
+        return true;
+    },
+    base() { return `https://firestore.googleapis.com/v1/projects/${FIREBASE.projectId}/databases/(default)/documents`; },
+    val(v) {
+        if (!v) return undefined;
+        if ("integerValue" in v) return Number(v.integerValue);
+        if ("doubleValue" in v) return Number(v.doubleValue);
+        if ("stringValue" in v) return v.stringValue;
+        return undefined;
+    },
+    async submit(m, sc, df, name, sp) {
+        if (!(await this.auth())) return;
+        const url = `${this.base()}/scores/${this.uid}`, hd = { Authorization: "Bearer " + this.token };
+        const got = await fetch(url, { headers: hd });
+        const cur = got.ok ? (await got.json()).fields || {} : {};
+        const best = this.val(cur[m]);
+        const fields = { name: { stringValue: name.slice(0, 18) }, t: { integerValue: String(Date.now()) } };
+        const paths = ["name", "t"];
+        if (!(best >= sc)) {
+            fields[m] = { integerValue: String(Math.round(sc)) };
+            fields[m + "Diff"] = { stringValue: String(df).slice(0, 10) };
+            fields[m + "Sp"] = { stringValue: String(sp).slice(0, 4) };
+            paths.push(m, m + "Diff", m + "Sp");
+        }
+        const q = paths.map(f => "updateMask.fieldPaths=" + encodeURIComponent(f)).join("&");
+        await fetch(`${url}?${q}`, { method: "PATCH", headers: { ...hd, "Content-Type": "application/json" }, body: JSON.stringify({ fields }) });
+    },
+    async top(m) {
+        const r = await fetch(`${this.base()}:runQuery?key=${FIREBASE.apiKey}`, {
+            method: "POST", headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ structuredQuery: {
+                from: [{ collectionId: "scores" }],
+                where: { fieldFilter: { field: { fieldPath: m }, op: "GREATER_THAN", value: { integerValue: "0" } } },
+                orderBy: [{ field: { fieldPath: m }, direction: "DESCENDING" }],
+                limit: 10
+            } })
+        });
+        if (!r.ok) throw new Error("firestore " + r.status);
+        const rows = await r.json();
+        return rows.filter(x => x.document).map(x => {
+            const f = x.document.fields || {}, id = x.document.name.split("/").pop();
+            return { name: String(this.val(f.name) || "Anonym"), score: this.val(f[m]), diff: this.val(f[m + "Diff"]), sp: String(this.val(f[m + "Sp"]) || ""), mine: id === this.uid };
+        });
+    }
+};
+
 const LB = {
-    db: null, uid: null, ready: null,
+    db: null, uid: null, ready: null, fb: false,
     init() {
         this.ready = (async () => {
             try {
-                if (!window.claude || typeof window.claude.use !== "function") return;
-                const db = await window.claude.use("db");
-                if (!db) return;
-                const user = await window.claude.use("user");
-                const uid = user ? await user.id() : null;
-                if (!uid) return;
-                this.db = db; this.uid = uid;
-            } catch (e) { /* ohne gemeinsame Liste weiter */ }
+                if (window.claude && typeof window.claude.use === "function") {
+                    const db = await window.claude.use("db");
+                    const user = db ? await window.claude.use("user") : null;
+                    const uid = user ? await user.id() : null;
+                    if (db && uid) { this.db = db; this.uid = uid; return; }
+                }
+            } catch (e) { /* weiter mit Firebase oder lokal */ }
+            if (FB.on()) {
+                try { this.fb = await FB.auth(); } catch (e) { this.fb = false; }
+            }
         })();
         return this.ready;
     },
@@ -3101,6 +3182,7 @@ const LB = {
         list.sort((a, b) => b.score - a.score);
         store.set("lb_" + m, list.slice(0, 20));
         await this.ready;
+        if (this.fb) { try { await FB.submit(m, sc, df, name, sp); } catch (e) { /* lokal reicht */ } return; }
         if (!this.db) return;
         try {
             const ref = this.db.doc("scores/" + this.uid);
@@ -3113,6 +3195,9 @@ const LB = {
     },
     async top(m) {
         await this.ready;
+        if (this.fb) {
+            try { return await FB.top(m); } catch (e) { /* auf lokale Liste zurückfallen */ }
+        }
         if (this.db) {
             try {
                 const snap = await this.db.collection("scores").where(m, ">", 0).orderBy(m, "desc").limit(10).get();
@@ -3121,7 +3206,7 @@ const LB = {
         }
         return this.localList(m).slice(0, 10).map(e => ({ ...e, mine: false }));
     },
-    note() { return this.db ? "Gemeinsame Vereins-Bestenliste – jeder mit Zugriff auf diese Seite sieht sie." : "Bestenliste auf diesem Gerät."; }
+    note() { return this.db || this.fb ? "Gemeinsame Vereins-Bestenliste – alle sehen dieselbe Liste." : "Bestenliste auf diesem Gerät."; }
 };
 LB.init();
 
