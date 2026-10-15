@@ -3082,7 +3082,7 @@ async function showEnd(reason) {
    Werte aus der Firebase-Konsole eintragen – siehe README, Abschnitt „Gemeinsame Bestenliste“.
    Leer lassen = Bestenliste nur auf dem Gerät.
    ================================================================= */
-const FIREBASE = { apiKey: "", projectId: "" };
+const FIREBASE = { apiKey: "AIzaSyC36YGwRB47_GK7W3NDnRiXhWkv0ipEfp0", projectId: "hau-den-strassdorfer" };
 
 const FB = {
     on: () => !!(FIREBASE.apiKey && FIREBASE.projectId),
@@ -3160,17 +3160,19 @@ const LB = {
     db: null, uid: null, ready: null, fb: false,
     init() {
         this.ready = (async () => {
+            // zuerst die gemeinsame Firebase-Liste, damit alle (GitHub-Seite und Claude-Link) dieselbe sehen
+            if (FB.on()) {
+                try { this.fb = await FB.auth(); } catch (e) { this.fb = false; }
+                if (this.fb) return;
+            }
             try {
                 if (window.claude && typeof window.claude.use === "function") {
                     const db = await window.claude.use("db");
                     const user = db ? await window.claude.use("user") : null;
                     const uid = user ? await user.id() : null;
-                    if (db && uid) { this.db = db; this.uid = uid; return; }
+                    if (db && uid) { this.db = db; this.uid = uid; }
                 }
-            } catch (e) { /* weiter mit Firebase oder lokal */ }
-            if (FB.on()) {
-                try { this.fb = await FB.auth(); } catch (e) { this.fb = false; }
-            }
+            } catch (e) { /* ohne gemeinsame Liste weiter */ }
         })();
         return this.ready;
     },
