@@ -19,7 +19,7 @@ Alles steckt in einer Datei (Logos eingebettet, Sounds werden im Browser erzeugt
 - **Endlos** – bis alle 3 Gold-Ochsen-Bierkrüge kaputt sind
 
 Schwierigkeit: Leicht, Mittel, Schwer und **Extrem** (verdammt schwer).
-Dazu 8 Figuren und 8 Waffen – alle Waffen mit Rechberg-Logo.
+Dazu 12 Figuren (u. a. Mini-Rambo, Russischer Magier, Lachsmann und LaWendl, die Blume) und 10 Waffen – darunter die Regenbogen-Kapitänsbinde und Lettis Augenklappe.
 
 ## Figuren & Gegenstände
 
