@@ -895,6 +895,7 @@ const TYPES = {
     letti:   { side: "rb", rise: "slow" },
     praes:   { side: "rb" },
     ali:     { side: "rb" },
+    popo:    { side: "rb" },
     zauberer:{ side: "rb", rise: "fast" },
     flasche: { side: "item" },
     wurst:   { side: "item" },
@@ -961,6 +962,8 @@ const LINES = {
         "Bloß net auf mi!", "Mir send die Guten!"],
     rbHit: ["Spinnsch du?!", "I bin auf DEINER Seite!", "Des sag i em Trainer!", "Falscher Kopf, Kerle!", "Du Bachel, i bin's!"],
     rbLeave: ["Danke, Kamerad!", "Puh, Glück ghabt!"],
+    popoPop: ["Kuss mi am Arsch, Straßdorf!", "Do, guck her!", "Mondschein über Rechberg!", "Des isch mei beste Seite!", "Hintatür isch offa!", "Für Straßdorf nur des Beste!"],
+    popoHit: ["AUA, mei Hintern!", "Des gibt an blaua Fleck!", "Ned auf d'Backa!", "Spinnsch? Des isch mei Sitzfleisch!"],
     praesPop: ["Wer den Präsidenten haut, wird von dr Polizei eingeknastet!", "Wer den Präsidenten haut, wird von dr Polizei eingeknastet!", "I bin dr Präsident!", "Respekt, bitte!", "Wehe dir!", "A Hoch auf Rechberg!", "Ruhe im Verein!"],
     bossPop: ["I bin XXXL!", "Horlacher isch unkaputtbar!", "Platz da, jetzt komm i!", "Mi kriegsch net klein!"],
     bossHit: ["Des kitzelt bloß!", "Mei Ranze!", "Uff!", "Hö!", "Aua, jetzt aber!", "Hör auf, du Seggel!", "Mir wird schwindlig…"]
@@ -1099,6 +1102,7 @@ function itemSVG(type) {
 /** Eine Figur, die aus dem Loch guckt. staticHit=true: eigenständiges SVG im getroffenen Zustand. */
 function guySVG(type, viewBox = "0 0 120 150", staticHit = false) {
     if (TYPES[type].side === "item") return itemSVG(type);
+    if (type === "popo") return popoSVG(viewBox);
     const side = TYPES[type].side;
     const old = type === "reich", fat = type === "dicker";
     const skin = old ? pick(["#f3c9a6", "#e9b892"]) : pick(SKIN);
@@ -1280,6 +1284,36 @@ function guySVG(type, viewBox = "0 0 120 150", staticHit = false) {
         ${over}
         <g class="bump"><ellipse cx="60" cy="22" rx="13" ry="11" fill="#ff8095" ${INK} stroke-width="3"/><ellipse cx="56" cy="18" rx="4" ry="2.5" fill="#fff" opacity=".7"/></g>
         ${hat}
+        <g class="stars" transform="translate(60 12) scale(1 .38)"><g class="spin">${stars}</g></g>
+    </svg>`;
+}
+
+/* Dr Rechberger, der nur sein Hintern zeigt – Gesicht guckt kopfüber zwischen de Füß durch */
+function popoSVG(viewBox = "0 0 120 150") {
+    const skin = pick(SKIN);
+    const stars = [0, 120, 240].map(a => { const r = a * Math.PI / 180; return `<polygon points="${starPoints(Math.cos(r) * 34, Math.sin(r) * 34, 11, 5)}" fill="#ffe600" ${INK} stroke-width="2.5"/>`; }).join("");
+    return `<svg class="g" xmlns="http://www.w3.org/2000/svg" viewBox="${viewBox}">
+        <path d="M30 96 L26 152 L52 152 L56 100Z M90 96 L94 152 L68 152 L64 100Z" fill="${skin}" ${INK} stroke-width="3.5"/>
+        <path d="M14 92 Q12 74 24 70 L96 70 Q108 74 106 92 L100 108 L20 108Z" fill="#1f4fd1" ${INK} stroke-width="4"/>
+        <path d="M20 80 H100 M22 88 H98" stroke="#fff" stroke-width="3"/>
+        <ellipse cx="40" cy="48" rx="27" ry="31" fill="${skin}" ${INK} stroke-width="4"/>
+        <ellipse cx="80" cy="48" rx="27" ry="31" fill="${skin}" ${INK} stroke-width="4"/>
+        <path d="M60 24 Q57 48 60 74" fill="none" stroke="#111" stroke-width="3.5" stroke-linecap="round"/>
+        <path d="M24 34 Q30 24 40 24 M96 34 Q90 24 80 24" fill="none" stroke="#fff" stroke-width="4" opacity=".55" stroke-linecap="round"/>
+        <ellipse cx="34" cy="58" rx="7" ry="5" fill="#ff6b6b" opacity=".35"/><ellipse cx="86" cy="58" rx="7" ry="5" fill="#ff6b6b" opacity=".35"/>
+        <g class="ex"><g fill="#e3343c" opacity=".75"><ellipse cx="78" cy="46" rx="9" ry="11"/><rect x="66" y="30" width="5" height="13" rx="2.5" transform="rotate(-20 68 36)"/>
+            <rect x="72" y="27" width="5" height="14" rx="2.5" transform="rotate(-8 74 34)"/><rect x="79" y="27" width="5" height="14" rx="2.5" transform="rotate(6 81 34)"/>
+            <rect x="86" y="30" width="5" height="12" rx="2.5" transform="rotate(20 88 36)"/></g></g>
+        <rect x="86" y="74" width="16" height="16" rx="3" fill="#fff" ${INK} stroke-width="2"/>
+        <text x="94" y="87" text-anchor="middle" font-family="Bangers, Impact, sans-serif" font-size="13" fill="#1f4fd1">R</text>
+        <g transform="translate(60 128) rotate(180)">
+            <ellipse cx="0" cy="0" rx="17" ry="16" fill="${skin}" ${INK} stroke-width="3"/>
+            <path d="M-16 -4 Q-14 -18 0 -18 Q14 -18 16 -4 Q8 -10 0 -10 Q-8 -10 -16 -4Z" fill="#6b4423" ${INK} stroke-width="2"/>
+            <g><circle cx="-6" cy="-1" r="3.5" fill="#fff" stroke="#111" stroke-width="1.5"/><circle cx="6" cy="-1" r="3.5" fill="#fff" stroke="#111" stroke-width="1.5"/>
+                <circle cx="-6" cy="0" r="1.6" fill="#111"/><circle cx="6" cy="0" r="1.6" fill="#111"/></g>
+            <g><path d="M-7 7 Q0 13 7 7Z" fill="#6b1010" stroke="#111" stroke-width="1.5"/><path d="M-3 9 Q0 17 3 9Z" fill="#ff6f8e" stroke="#111" stroke-width="1"/></g>
+        </g>
+        <g class="mx"></g><g class="br"></g><g class="cr"></g><g class="bump"></g>
         <g class="stars" transform="translate(60 12) scale(1 .38)"><g class="spin">${stars}</g></g>
     </svg>`;
 }
@@ -1844,13 +1878,13 @@ function chooseType(p) {
     const lettiOk = !lettiRun && !holes.some(h => h.type === "letti" && h.state !== "down");
     const X = settings.diff === "extrem";
     let table = [
-        ["rb", X ? .22 : .16], ["letti", lettiOk && p > .03 ? .07 : 0], ["praes", p > (X ? .1 : .25) ? (X ? .035 : .02) : 0],
+        ["rb", X ? .22 : .16], ["popo", X ? .05 : .04], ["letti", lettiOk && p > .03 ? .07 : 0], ["praes", p > (X ? .1 : .25) ? (X ? .035 : .02) : 0],
         ["reich", .05], ["trainer", .08], ["dicker", .08], ["trottel", p > .1 ? .11 : 0],
         ["bombe", p > .2 ? (X ? .07 : .035) : 0], ["flasche", X ? .015 : .03], ["wurst", MODES[mode()].duration ? .025 : 0]
     ];
     if (ev && ev.type === "fanblock") table = [["trottel", .15], ["dicker", .1], ["trainer", .08], ["reich", .05]];
     if (ev && ev.type === "freibier") table = [["flasche", .25], ["wurst", MODES[mode()].duration ? .2 : 0], ["rb", .15]];
-    if (ev && ev.type === "auswechslung") table = [["rb", .6], ["letti", lettiOk ? .06 : 0], ["praes", .04]];
+    if (ev && ev.type === "auswechslung") table = [["rb", .5], ["popo", .12], ["letti", lettiOk ? .06 : 0], ["praes", .04]];
     let r = Math.random();
     for (const [t, w] of table) { if (r < w) return t; r -= w; }
     return "idiot";
@@ -1920,8 +1954,12 @@ function materialize(h, t, p) {
     if (t === "praes") report("praes", 2);
 
     const lines = { idiot: LINES.idiotPop, trottel: LINES.trottelPop, dicker: LINES.dickerPop, trainer: LINES.trainerPop,
-        reich: LINES.reichPop, rb: LINES.rbPop, praes: LINES.praesPop, letti: ["Voll-Speed Letti!"] }[t];
-    const chance = t === "idiot" ? .3 : (t === "letti" || t === "praes" ? 1 : .7);
+        reich: LINES.reichPop, rb: LINES.rbPop, praes: LINES.praesPop, letti: ["Voll-Speed Letti!"], popo: LINES.popoPop }[t];
+    const chance = t === "idiot" ? .3 : (t === "letti" || t === "praes" ? 1 : t === "popo" ? .85 : .7);
+    if (t === "popo") {
+        if (Math.random() < .35) SFX.fart();
+        if (Math.random() < .3) reportText(pick(["Oh nein – do zeigt oiner dem Straßdorfer Block sein Hintern!", "A Rechberger lässt d'Hos runter – Mondschein am helllichten Tag!", "Der zeigt Straßdorf, was er von ihnen hält. Ned hauen, des isch oiner von uns!"]), 1);
+    }
     if (lines && Math.random() < chance) say(h, pick(lines), Math.min(stay, 1500)); else hush(h);
 }
 
@@ -2393,12 +2431,13 @@ function whack(h, x, y, chained = false) {
         copArrives();
         return;
     }
-    if (t === "rb" || t === "letti") {
+    if (t === "rb" || t === "letti" || t === "popo") {
         h.state = "hit"; h.until = gt + 650; h.guy.classList.add("hit");
         const hat = h.gi.querySelector(".hat"); if (hat) hat.classList.add("off");
         score -= 30; floatText(x, y, "−30", "neg");
         loseCombo(); stats.own++; SFX.buzz();
         if (t === "letti") { say(h, "Aua – jetzt sieh i gar nix mehr!", 1200); lettiEffect(); burst(x, y, "LETTI!", "blue"); report("lettiHit", 3); }
+        else if (t === "popo") { say(h, pick(LINES.popoHit), 1100); burst(x, y, "ARSCHKARTE!", "bad"); SFX.fart(); reportText("Voll auf d'Backa vom eigenen Mann! Des isch die Arschkarte!", 3); }
         else { say(h, pick(LINES.rbHit), 1000); burst(x, y, "EIGENTOR!", "bad"); report("own", 3); }
         SFX.boo(); SFX.pfiffe();
         callAli(h);
@@ -2736,7 +2775,7 @@ function copArrives() {
    dann wird abgedrückt. Punkte in den 3 Sekunden zählen doppelt, alle 6 erwischt = +184. */
 const FOTO_AT = 1884, FOTO_BONUS = 184;
 const FOTO_SD = ["idiot", "trottel", "dicker", "trainer", "reich", "heimann"];
-const FOTO_RB = ["rb", "rb", "rb", "rb", "letti"];
+const FOTO_RB = ["rb", "rb", "rb", "popo", "letti"];
 function startFoto() {
     fotoDone = true;
     cancelGags();
@@ -3763,6 +3802,7 @@ $("#rules").innerHTML = RULES.map(([t, n, d, c]) => `<div class="rule ${c}"><div
      <div class="rule"><div class="ic">🎆</div><div><b>Ereignisse</b><br>Fanblock, Pyro, Freibier, Rechberger-Ansturm, Flutlicht aus</div></div>
      <div class="rule"><div class="ic">💨</div><div><b>Daneben</b><br>Ins leere Loch ghauen: −5</div></div>
      <div class="rule"><div class="ic">🪙</div><div><b>Beulen-Taler</b><br>1 Taler pro Treffer. Im Strafenkatalog gibt's Münze & Wolf.</div></div>
+     <div class="rule"><div class="ic">🍑</div><div><b>Dr Hintern-Rechberger</b><br>Zeigt Straßdorf immer nur sein Hintern. Ned hauen – des isch oiner von uns! Sonst: Arschkarte, −30</div></div>
      <div class="rule"><div class="ic">😤</div><div><b>Ali</b><br>Wer an Rechberger haut, kriegt Stress mit Ali: er taucht auf und hebt dir kurz den Hammer fest. Ali hauen = −50!</div></div>
      <div class="rule"><div class="ic">🪄</div><div><b>Dr Russische Zauberer</b><br>Ab und zu tänzelt er mit em Ball über 4–5 Löcher. Ned hauen – Foul = −50!</div></div>
      <div class="rule"><div class="ic">📸</div><div><b>Präsidenten-Foto</b><br>Bei 1.884 Punkten: alle Löcher voll – 3 Sek. lang d'Straßdorfer verhauen, Punkte zählen doppelt. Alle 6 erwischt = +184. Ned den Präsidenten hauen!</div></div>

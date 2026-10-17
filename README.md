@@ -57,6 +57,8 @@ mit Fan-Raunen, Jubel, Buhrufen, Pfiffen und „Olé, olé“-Gesängen.
 - **Dr Präsident & d'Polizei** – der Präsident warnt beim Auftauchen gern: „Wer den Präsidenten haut, wird von dr Polizei
   eingeknastet!“ Wer's trotzdem macht: Sirene, Blaulicht, ein Polizist rennt rein – und auf dem Knast-Bildschirm steht er
   neben der Zelle.
+- **Dr Hintern-Rechberger** – a Rechberger, der Straßdorf immer nur sein Hintern zeigt (sein Gesicht guckt kopfüber zwischen
+  de Füß durch). Ned hauen – sonst gibt's die „ARSCHKARTE!“: −30, Combo weg und Ali kommt. Beim Präsidenten-Foto isch er au dabei.
 - **Ali** – wer einen Rechberger (oder Letti) haut, kriegt Stress mit Ali. Er beschützt seine Jungs, taucht direkt daneben
   auf („Ey! Wer hat mein Jung ghauen?!“) und hebt dir 1,6 Sekunden lang den Hammer fest – solange zählt kein Schlag.
   Ali selbst hauen = −50, Combo weg und noch länger festhalten. Lässt man ihn in Ruhe, zieht er nach ein paar Sekunden ab.
